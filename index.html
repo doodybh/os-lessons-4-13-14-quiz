@@ -97,6 +97,19 @@
         cursor: pointer;
         font-weight: bold;
       }
+
+      .dark-toggle button.light {
+        background-color: #ffffff;
+        color: #000;
+        border: 1px solid #ccc;
+      }
+
+      .dark-toggle button.dark {
+        background-color: #222;
+        color: #fff;
+        border: 1px solid #555;
+      }
+
       .mobile-icon {
         display: none;
       }
@@ -134,8 +147,10 @@
   <body>
     <div class="dark-toggle">
       <button onclick="toggleDark()">
-        <span class="desktop-text">🌙 Dark Mode</span>
-        <span class="mobile-icon">🌙</span>
+        <span class="desktop-text">
+          <span id="themeText">🌙 Dark Mode</span>
+        </span>
+        <span class="mobile-icon" id="themeIcon">🌙</span>
       </button>
     </div>
 
@@ -1993,13 +2008,24 @@
 
       function toggleDark() {
         document.body.classList.toggle("dark");
-        localStorage.setItem(
-          "quizDarkMode",
-          document.body.classList.contains("dark"),
-        );
-      }
-      if (localStorage.getItem("quizDarkMode") === "true") {
-        document.body.classList.add("dark");
+
+        const themeText = document.getElementById("themeText");
+        const themeIcon = document.getElementById("themeIcon");
+        const btn = document.querySelector(".dark-toggle button");
+
+        if (document.body.classList.contains("dark")) {
+          themeText.textContent = "☀️ Light Mode";
+          themeIcon.textContent = "☀️";
+
+          btn.classList.add("dark");
+          btn.classList.remove("light");
+        } else {
+          themeText.textContent = "🌙 Dark Mode";
+          themeIcon.textContent = "🌙";
+
+          btn.classList.add("light");
+          btn.classList.remove("dark");
+        }
       }
     </script>
   </body>
