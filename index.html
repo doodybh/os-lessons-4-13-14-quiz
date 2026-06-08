@@ -1,118 +1,2006 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>OS Lessons 4, 13 & 14 Self-Test Quiz</title>
-<style>
-body { font-family: Arial, sans-serif; margin: 0; background: #f7f7fb; color: #222; }
-.container { max-width: 900px; margin: 30px auto; background: white; padding: 28px; border-radius: 18px; box-shadow: 0 4px 20px rgba(0,0,0,.08); }
-h1 { margin-top: 0; }
-.progress { margin: 15px 0; font-weight: bold; }
-.question { font-size: 20px; font-weight: bold; margin: 22px 0; line-height: 1.35; }
-.option { display: block; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; cursor: pointer; }
-.option:hover { background: #f1f1f8; }
-button { padding: 12px 18px; border: 0; border-radius: 10px; cursor: pointer; margin: 8px 6px 8px 0; font-weight: bold; }
-.primary { background: #111827; color: white; }
-.secondary { background: #e5e7eb; }
-.feedback { padding: 14px; border-radius: 12px; margin-top: 15px; font-weight: bold; display:none; }
-.correct { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
-.wrong { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
-.small { color: #555; font-size: 14px; }
-.resultItem { padding: 10px; border-bottom: 1px solid #eee; }
-</style>
-</head>
-<body>
-<div class="container">
-<h1>OS Lessons 4, 13 & 14 Self-Test Quiz</h1>
-<p class="small">109 questions. Choose your answer, click Check Answer, then the correct answer appears immediately. Your final score appears at the end.</p>
-<div id="startScreen">
-<button class="primary" onclick="startQuiz(false)">Start in order</button>
-<button class="secondary" onclick="startQuiz(true)">Shuffle questions</button>
-</div>
-<div id="quizScreen" style="display:none;">
-<div class="progress" id="progress"></div>
-<div class="question" id="question"></div>
-<form id="options"></form>
-<div id="feedback" class="feedback"></div>
-<button class="primary" id="checkBtn" onclick="checkAnswer()">Check Answer</button>
-<button class="secondary" id="nextBtn" onclick="nextQuestion()" style="display:none;">Next</button>
-</div>
-<div id="resultScreen" style="display:none;"></div>
-</div>
-<script>
-const originalQuestions = [{"num": 1, "question": "If massive shares were split across multiple servers, what is the best way to make them appear as a single, unified directory tree?", "options": [{"letter": "A", "text": "Windows Server 2012 R2 Distributed File System"}, {"letter": "B", "text": "Windows Server 2012 R2 File Replication Service"}, {"letter": "C", "text": "Windows Server 2012 R2 Storage Spaces"}, {"letter": "D", "text": "Windows Server 2012 R2 Network Load Balancing"}], "answer": "A"}, {"num": 2, "question": "Users generally do not understand the concept of network drive sharing. They only know they can store their files \"on my F: drive\" and are unaware that someone else's F: drive might point to a different folder. What do we call this concept of having a drive letter associated to a user's network folder?", "options": [{"letter": "A", "text": "SMB Share-Quick"}, {"letter": "B", "text": "SMB Share-Advanced"}, {"letter": "C", "text": "Mapping drives"}, {"letter": "D", "text": "NFS Share-Advanced"}], "answer": "C"}, {"num": 3, "question": "What are an administrator's choices for managing file permissions on a drive formatted as FAT32?", "options": [{"letter": "A", "text": "Permissions cannot be managed on FAT32 drives."}, {"letter": "B", "text": "If the drive is a network share, then Share permissions can be used."}, {"letter": "C", "text": "Only read-only permissions can be applied."}, {"letter": "D", "text": "File permissions can only be managed through third-party tools."}], "answer": "B"}, {"num": 4, "question": "When configuring file and share access, why should you assign permissions?", "options": [{"letter": "A", "text": "File permissions"}, {"letter": "B", "text": "If the drive is a network share, then Share permissions can be used."}, {"letter": "C", "text": "To improve data security by granting file and share access only to those users who need it"}, {"letter": "D", "text": "access control entries; access control list"}], "answer": "C"}, {"num": 5, "question": "With the Volume Shadow Copy Service enabled, what does the system do if the maximum number of copies supported by Windows Server 2012 R2 is reached?", "options": [{"letter": "A", "text": "The system stops creating new copies."}, {"letter": "B", "text": "The system overwrites the most recent copy."}, {"letter": "C", "text": "The system archives the oldest copy instead."}, {"letter": "D", "text": "The system copies, and then deletes the oldest copy."}], "answer": "D"}, {"num": 6, "question": "Using File and Storage Services in Server Manager, you will create a new share. The New Share Wizard prompts you for a profile. You need a profile that provides basic NFS sharing with authentication and permissions. Which do you choose?", "options": [{"letter": "A", "text": "SMB Share-Quick"}, {"letter": "B", "text": "NTFS Permissions"}, {"letter": "C", "text": "NFS Share-Quick"}, {"letter": "D", "text": "NFS Share-Advanced"}], "answer": "C"}, {"num": 7, "question": "You know that installing Windows Server 2012 R2 includes Storage Services by default. Why can't you then create and manage SMB shares using Server Manager? What must be installed first?", "options": [{"letter": "A", "text": "File Server role service"}, {"letter": "B", "text": "Network Adapter configuration"}, {"letter": "C", "text": "Active Directory Domain Services"}, {"letter": "D", "text": "Remote Desktop Services"}], "answer": "A"}, {"num": 8, "question": "Using File and Storage Services in Server Manager, you will create a new share. The New Share Wizard prompts you for a profile. You need a profile that provides NFS sharing with authentication and permissions, plus access to services provided by File Server Resource Manager. Which do you choose?", "options": [{"letter": "A", "text": "SMB Share-Quick"}, {"letter": "B", "text": "SMB Share-Advanced"}, {"letter": "C", "text": "NFS Share-Quick"}, {"letter": "D", "text": "NFS Share-Advanced"}], "answer": "D"}, {"num": 9, "question": "You grant a user the NTFS permissions needed to access a file. You then move the file to a different location. Is the user still able to access the file?", "options": [{"letter": "A", "text": "Yes, when you move the file, its permissions go with it."}, {"letter": "B", "text": "No, moving the file resets its permissions."}, {"letter": "C", "text": "Yes, but only if the destination folder has the same permissions."}, {"letter": "D", "text": "No, the user must be granted access again."}], "answer": "A"}, {"num": 10, "question": "To simplify the administration process, you should always assign permissions to ____ rather than to individuals.", "options": [{"letter": "A", "text": "security groups"}, {"letter": "B", "text": "individual accounts"}, {"letter": "C", "text": "temporary users"}, {"letter": "D", "text": "public access"}], "answer": "A"}, {"num": 11, "question": "Using File and Storage Services in Server Manager, you will create a new share. The New Share Wizard prompts you for a profile. You need a profile that provides SMB sharing with settings suitable for Hyper-V and other applications. Which do you choose?", "options": [{"letter": "A", "text": "SMB Share-Quick"}, {"letter": "B", "text": "SMB Share-Advanced"}, {"letter": "C", "text": "SMB Share-Applications"}, {"letter": "D", "text": "File and Storage Services in Server Manager"}], "answer": "C"}, {"num": 12, "question": "Which of these is NOT one of the Windows permission systems?", "options": [{"letter": "A", "text": "Work Folders"}, {"letter": "B", "text": "File permissions"}, {"letter": "C", "text": "Access policies"}, {"letter": "D", "text": "Volume Shadow Copies"}], "answer": "B"}, {"num": 13, "question": "What is the Windows Server 2012 R2 feature that enables you to maintain previous versions of files on a server, so that if users accidentally delete or overwrite a file, they can access a copy?", "options": [{"letter": "A", "text": "Work Folders"}, {"letter": "B", "text": "NTFS permissions"}, {"letter": "C", "text": "File permissions"}, {"letter": "D", "text": "Volume Shadow Copies"}], "answer": "D"}, {"num": 14, "question": "Using File and Storage Services in Server Manager, you will create a new share. The New Share Wizard prompts you for a profile. You need a profile that provides SMB sharing with full share and NTFS permissions and access to services provided by File Server Resource Manager. Which do you choose?", "options": [{"letter": "A", "text": "SMB Share-Quick"}, {"letter": "B", "text": "SMB Share-Advanced"}, {"letter": "C", "text": "NFS Share-Quick"}, {"letter": "D", "text": "NFS Share-Advanced"}], "answer": "B"}, {"num": 15, "question": "Which of the following permission systems is responsible for controlling access to files and folders stored on the local disk volume?", "options": [{"letter": "A", "text": "Work Folders"}, {"letter": "B", "text": "NTFS permissions"}, {"letter": "C", "text": "NFS Share-Quick"}, {"letter": "D", "text": "Volume Shadow Copies"}], "answer": "B"}, {"num": 16, "question": "After applying permissions to a group that already inherits permissions, you are concerned about the effective access. Rather than examine and evaluate all possible permission sources, where can you check the effective access more easily?", "options": [{"letter": "A", "text": "Reviewing the group policy settings."}, {"letter": "B", "text": "Clicking the Effective Access tab on the Advanced Security Settings dialog box."}, {"letter": "C", "text": "Checking the user account properties."}, {"letter": "D", "text": "Using command line tools to list permissions."}], "answer": "B"}, {"num": 17, "question": "Knowing how permissions can be cumulative or override each other is an important factor in understanding what?", "options": [{"letter": "A", "text": "File permissions"}, {"letter": "B", "text": "NTFS permissions"}, {"letter": "C", "text": "Mapping drives"}, {"letter": "D", "text": "Understanding effective access"}], "answer": "D"}, {"num": 18, "question": "The company's Board of Directors would like you to create private folders, which users should not know exist. While you are creating the new network share for their folders, which New Share option should you choose to prevent users from seeing the folders?", "options": [{"letter": "A", "text": "SMB Share-Advanced"}, {"letter": "B", "text": "File permissions"}, {"letter": "C", "text": "Enable access-based enumeration"}, {"letter": "D", "text": "File and Storage Services in Server Manager"}], "answer": "C"}, {"num": 19, "question": "Windows Server 2012 R2 supports two types of folder shares. What are those two types?", "options": [{"letter": "A", "text": "Local File System and Remote Access"}, {"letter": "B", "text": "Cloud Storage and External Drives"}, {"letter": "C", "text": "File Transfer Protocol and WebDAV"}, {"letter": "D", "text": "Network File System and Server Message Blocks"}], "answer": "D"}, {"num": 20, "question": "What service allows users to store files on a network file server, which can be accessed from multiple workstations or devices?", "options": [{"letter": "A", "text": "Work Folders"}, {"letter": "B", "text": "File Permissions"}, {"letter": "C", "text": "Offline Folders"}, {"letter": "D", "text": "Volume Shadow Copies"}], "answer": "A"}, {"num": 21, "question": "What is the primary tool in Windows Server 2012 R2 to take control of the shares on all your disks on all your servers and exercise granular control over their properties?", "options": [{"letter": "A", "text": "Disk Management Tool"}, {"letter": "B", "text": "Task Scheduler"}, {"letter": "C", "text": "Windows PowerShell"}, {"letter": "D", "text": "File and Storage Services in Server Manager"}], "answer": "D"}, {"num": 22, "question": "What is the maximum number of shadow copies supported by Windows Server 2012 R2?", "options": [{"letter": "A", "text": "32"}, {"letter": "B", "text": "64"}, {"letter": "C", "text": "512"}, {"letter": "D", "text": "256"}], "answer": "B"}, {"num": 23, "question": "Using File and Storage Services in Server Manager, you will create a new share. The New Share Wizard prompts you for a profile. You need a profile for basic SMB sharing with full share and NTFS permissions. Which do you choose?", "options": [{"letter": "A", "text": "SMB Share-Quick"}, {"letter": "B", "text": "SMB Share-Advanced"}, {"letter": "C", "text": "NFS Share-Quick"}, {"letter": "D", "text": "NFS Share-Advanced"}], "answer": "A"}, {"num": 24, "question": "When you manage permissions in any of the Windows Server 2012 R2 permission systems, you are actually creating and modifying the _______ in an _______.", "options": [{"letter": "A", "text": "user roles; permission matrix"}, {"letter": "B", "text": "file attributes; metadata"}, {"letter": "C", "text": "security tokens; user profiles"}, {"letter": "D", "text": "access control entries; access control list"}], "answer": "D"}, {"num": 25, "question": "Which of the following statements about permissions are true?", "options": [{"letter": "A", "text": "All permissions must be granted to every user for security reasons."}, {"letter": "B", "text": "Permissions can be ignored if the user is an administrator."}, {"letter": "C", "text": "ACLs are composed of ACEs.; Basic permissions are composed of advanced permissions.; All permissions are stored as part of the protected resource."}, {"letter": "D", "text": "Permissions are only applicable to network resources and not local files."}], "answer": "C"}, {"num": 26, "question": "Which of the following sets of permissions is responsible for controlling access to files and folders stored on a local disk volume?", "options": [{"letter": "A", "text": "NTFS permissions"}, {"letter": "B", "text": "Group permissions"}, {"letter": "C", "text": "Share permissions"}, {"letter": "D", "text": "Explicit permissions"}], "answer": "A"}, {"num": 27, "question": "Which of the following terms describes the process of granting users access to file server shares by reading their permissions?", "options": [{"letter": "A", "text": "Authentication"}, {"letter": "B", "text": "Authorization"}, {"letter": "C", "text": "Enumeration"}, {"letter": "D", "text": "Assignment"}], "answer": "B"}, {"num": 28, "question": "Which of the following statements is not true in reference to resource ownership?", "options": [{"letter": "A", "text": "ACLs are composed of ACEs.; Basic permissions are composed of advanced permissions.; All permissions are stored as part of the protected resource."}, {"letter": "B", "text": "Inherited permissions take precedence over explicit permissions."}, {"letter": "C", "text": "It is possible to lock out a file or folder by assigning a combination of permissions that permits access to no one at all, including the owner of the file or folder."}, {"letter": "D", "text": "The security principal in file system permission assignments is the person to whom the permissions are assigned."}], "answer": "C"}, {"num": 29, "question": "If massive shares were split across multiple servers, what is the best way to make them appear as a single, unified directory tree?", "options": [{"letter": "A", "text": "A cloud storage solution that does not integrate with local servers."}, {"letter": "B", "text": "A simple file share that does not require any server configuration."}, {"letter": "C", "text": "A legacy file system that cannot handle multiple servers."}, {"letter": "D", "text": "Windows Server 2012 Distributed File System"}], "answer": "D"}, {"num": 30, "question": "Which of the following are tasks you can perform by using the quotas in File Server Resource Manager but can't perform by using NTFS quotas?", "options": [{"letter": "A", "text": "Send an email message to an administrator when users exceed their limits."}, {"letter": "B", "text": "Specify different storage limits for each user."}, {"letter": "C", "text": "Prevent users from consuming storage space on a volume beyond their allotted limit."}, {"letter": "D", "text": "Generate warnings to users when they approach their allotted storage limit."}], "answer": "A,B,D"}, {"num": 31, "question": "What is a key reason for assigning permissions when configuring file and share access?", "options": [{"letter": "A", "text": "Allows all users unrestricted access to all files and shares."}, {"letter": "B", "text": "Increases the complexity of file management by removing user access controls."}, {"letter": "C", "text": "Improves data security, granting file and share access only to the users who need it."}, {"letter": "D", "text": "Reduces the need for backups by allowing open access to all data."}], "answer": "C"}, {"num": 32, "question": "You are deciding which file system to use. You need NTFS permission system support. You don't presently need encryption or compression, but might at a later date. What file system is your best choice?", "options": [{"letter": "A", "text": "A proprietary file system that does not support NTFS permissions."}, {"letter": "B", "text": "ExFAT file system which is optimized for flash drives."}, {"letter": "C", "text": "FAT32 file system which supports encryption and compression."}, {"letter": "D", "text": "The traditional NTFS file system"}], "answer": "D"}, {"num": 33, "question": "Which of the following is the best description of a security principal?", "options": [{"letter": "A", "text": "the person granting permissions to network users"}, {"letter": "B", "text": "the network resource receiving permissions"}, {"letter": "C", "text": "a collection of individual special permissions"}, {"letter": "D", "text": "an object that assigns permissions"}], "answer": "D"}, {"num": 34, "question": "Knowing how permissions can be cumulative or override each other is an important factor in understanding what?", "options": [{"letter": "A", "text": "Special permissions"}, {"letter": "B", "text": "Troubleshoot"}, {"letter": "C", "text": "Auditing"}, {"letter": "D", "text": "Effective access"}], "answer": "D"}, {"num": 35, "question": "In the Windows Server 2012 R2 NTFS permission system, combinations of advanced permissions are also known as _______ permissions. (Choose all that apply.)", "options": [{"letter": "A", "text": "Special"}, {"letter": "B", "text": "Basic"}, {"letter": "C", "text": "Share"}, {"letter": "D", "text": "Standard"}], "answer": "B,D"}, {"num": 36, "question": "Which of the following statements about effective access is not true?", "options": [{"letter": "A", "text": "Inherited permissions can be modified but explicit permissions cannot."}, {"letter": "B", "text": "Inherited permissions take precedence over explicit permissions."}, {"letter": "C", "text": "Permissions can only be assigned to groups, not individual users."}, {"letter": "D", "text": "Explicit permissions are always more secure than inherited permissions."}], "answer": "B"}, {"num": 37, "question": "Which of the following statements best describes the role of the security principal in file system permission assignments?", "options": [{"letter": "A", "text": "The security principal in file system permission assignments is the only person who can access a file that has no permissions assigned to it."}, {"letter": "B", "text": "The security principal in file system permission assignments is the person responsible for creating permission policies."}, {"letter": "C", "text": "The security principal in file system permission assignments is the person assigning the permissions."}, {"letter": "D", "text": "The security principal in file system permission assignments is the person to whom the permissions are assigned."}], "answer": "D"}, {"num": 38, "question": "A list of all the objects in an Active Directory Domain Services forest and a subset of each object's attributes, used by domain controllers to locate and access the resources of other domains in the same forest.", "options": [{"letter": "A", "text": "database catalog"}, {"letter": "B", "text": "global directory"}, {"letter": "C", "text": "global catalog"}, {"letter": "D", "text": "database directory"}], "answer": "C"}, {"num": 39, "question": "When is an Active Directory site topology created?", "options": [{"letter": "A", "text": "Site topology is started upon initial installation of the Active Directory."}, {"letter": "B", "text": "Site topology starts when you finalize the links and subnets configuration."}, {"letter": "C", "text": "Creation of sites and its topology is dependent on link costs."}, {"letter": "D", "text": "Site topology is manually configured dependent on WAN bandwidth and transmission speed."}], "answer": "D"}, {"num": 40, "question": "What is an important difference between groups and OUs?", "options": [{"letter": "A", "text": "OUs can have nested groups within them."}, {"letter": "B", "text": "Group memberships are independent of the domain's tree structure."}, {"letter": "C", "text": "Groups cannot span multiple domains."}, {"letter": "D", "text": "Groups can only contain users from the same OU."}], "answer": "B"}, {"num": 41, "question": "What is a container object that functions in a subordinate capacity to a domain, and still inherits policies and permissions from its parent objects?", "options": [{"letter": "A", "text": "Organizational unit"}, {"letter": "B", "text": "Domain controller"}, {"letter": "C", "text": "Leaf object"}, {"letter": "D", "text": "Shared folder"}], "answer": "A"}, {"num": 42, "question": "In Active Directory Domain Services, an object, such as a domain or organizational unit, that has leaf objects or other container objects as its subordinates.", "options": [{"letter": "A", "text": "leaf object"}, {"letter": "B", "text": "domain"}, {"letter": "C", "text": "container object"}, {"letter": "D", "text": "group object"}], "answer": "C"}, {"num": 43, "question": "What is the process of granting the user access only to the resources he or she is permitted to use?", "options": [{"letter": "A", "text": "Authentication"}, {"letter": "B", "text": "Authorization"}, {"letter": "C", "text": "Accountability"}, {"letter": "D", "text": "Replication"}], "answer": "B"}, {"num": 44, "question": "An Active Directory _____ consists of one or more separate domain trees.", "options": [{"letter": "A", "text": "forest"}, {"letter": "B", "text": "network"}, {"letter": "C", "text": "subnet"}, {"letter": "D", "text": "cluster"}], "answer": "A"}, {"num": 45, "question": "In Active Directory Domain Services, an object, such as a user or computer, which is incapable of containing any other object.", "options": [{"letter": "A", "text": "schema object"}, {"letter": "B", "text": "leaf object"}, {"letter": "C", "text": "container object"}, {"letter": "D", "text": "attribute object"}], "answer": "B"}, {"num": 46, "question": "In Active Directory Domain Services, a domain controller that supports only incoming replication traffic.", "options": [{"letter": "A", "text": "Backup Domain Controller (bdc)"}, {"letter": "B", "text": "Primary domain controller (pdc) emulator"}, {"letter": "C", "text": "Read-Only Domain Controller (RODC)"}, {"letter": "D", "text": "Directory Access Protocol (DAP)"}], "answer": "C"}, {"num": 47, "question": "What is the process by which domain controllers communicate by sending database information to each other to stay synchronized?", "options": [{"letter": "A", "text": "Authorization"}, {"letter": "B", "text": "Transcription"}, {"letter": "C", "text": "Recovery"}, {"letter": "D", "text": "Replication"}], "answer": "D"}, {"num": 48, "question": "What defines what objects exist as well as what attributes are associated with any object in the Active Directory?", "options": [{"letter": "A", "text": "Active Directory schema"}, {"letter": "B", "text": "Active directory global directory"}, {"letter": "C", "text": "Active directory root user"}, {"letter": "D", "text": "Schema master"}], "answer": "A"}, {"num": 49, "question": "Which of the following features allows you to create virtual machines on a leased cloud resource?", "options": [{"letter": "A", "text": "Platform as a Service (PaaS)"}, {"letter": "B", "text": "Infrastructure as a Service (IaaS)"}, {"letter": "C", "text": "Software as a Service (SaaS)"}, {"letter": "D", "text": "Network as a Service (NaaS)"}], "answer": "B"}, {"num": 50, "question": "A technique in which duplicate copies of a file are updated on a regular basis, no matter which copy changes. For example, if a file is duplicated on four different servers, a user can access any of the four copies and modify the file as needed. The replication engine uses the changes made to the modified copy to update the other three copies. Compare to single master replication.", "options": [{"letter": "A", "text": "authorization"}, {"letter": "B", "text": "multiple-master replication"}, {"letter": "C", "text": "single-master replication"}, {"letter": "D", "text": "directory schema"}], "answer": "B"}, {"num": 51, "question": "What special DNS resource record enables clients to locate domain controllers and other vital AD DS services?", "options": [{"letter": "A", "text": "TTL"}, {"letter": "B", "text": "SPF"}, {"letter": "C", "text": "SRV"}, {"letter": "D", "text": "PTR"}, {"letter": "C", "text": "SRV"}], "answer": "C"}, {"num": 52, "question": "A communications protocol specified in the X.500 standard. It is also the progenitor of the Lightweight Directory Access Protocol (LDAP).", "options": [{"letter": "A", "text": "Active Directory Domain Services (AD DS)"}, {"letter": "B", "text": "Directory operational binding management protocol"}, {"letter": "C", "text": "Directory Access Protocol (DAP)"}, {"letter": "D", "text": "Read-Only Domain Controller (RODC)"}], "answer": "C"}, {"num": 53, "question": "Which of the following features allows you to install AD DS on a virtual machine that is located in the cloud?", "options": [{"letter": "A", "text": "Pci Dss"}, {"letter": "B", "text": "Google App Engine"}, {"letter": "C", "text": "Sql Azure"}, {"letter": "D", "text": "Windows Azure"}], "answer": "D"}, {"num": 54, "question": "What does LDAP stand for?", "options": [{"letter": "A", "text": "Lightweight Data Access Protocol (LDAP)"}, {"letter": "B", "text": "Local Directory Access Protocol (LDAP)"}, {"letter": "C", "text": "Lightweight Directory Access Protocol (LDAP)"}, {"letter": "D", "text": "Layered Directory Access Protocol (LDAP)"}], "answer": "B"}, {"num": 55, "question": "What type of Active Directory replication minimizes problems in database management over slow WAN links?", "options": [{"letter": "A", "text": "Global catalog"}, {"letter": "B", "text": "Directory schema"}, {"letter": "C", "text": "Multiple-master replication"}, {"letter": "D", "text": "Single-master replication"}, {"letter": "C", "text": "Multiple-master replication"}], "answer": "C"}, {"num": 56, "question": "A technique in which duplicate copies of a file are updated on a regular basis from one master copy. For example, if a file is duplicated on four different servers, users can modify one copy and the replication engine propagates the changes to the other three copies. Compare with multiplemaster replication.", "options": [{"letter": "A", "text": "multiserver replication"}, {"letter": "B", "text": "multiple-master replication"}, {"letter": "C", "text": "single-master replication"}, {"letter": "D", "text": "multi-master replication"}], "answer": "C"}, {"num": 57, "question": "In Active Directory Domain Services, the first domain created in a forest.", "options": [{"letter": "A", "text": "same security entity as one active directory forest, bidirectional trust between domain trees"}, {"letter": "B", "text": "tree root domain"}, {"letter": "C", "text": "forest root domain"}, {"letter": "D", "text": "parent root domain"}], "answer": "C"}, {"num": 58, "question": "For Server Core installations, how does Windows Server 2012 R2 differ from Windows Server 2008 when installing the AD DS role and promoting the system to a domain controller?", "options": [{"letter": "A", "text": "Windows Server 2012 R2 requires a GUI for installation."}, {"letter": "B", "text": "Windows Server 2012 R2 now allows administrators to use PowerShell."}, {"letter": "C", "text": "Windows Server 2012 R2 has no changes from 2008."}, {"letter": "D", "text": "Windows Server 2012 R2 does not support domain controllers."}], "answer": "B"}, {"num": 59, "question": "What is the global catalog?", "options": [{"letter": "A", "text": "A security policy for the domain"}, {"letter": "B", "text": "A backup of the Active Directory database"}, {"letter": "C", "text": "An index of all AD DS objects in a forest"}, {"letter": "D", "text": "A list of all users in the domain"}], "answer": "C"}, {"num": 60, "question": "The process by which Windows Server 2012 R2 verifies that the user matches the user account employed to gain access.", "options": [{"letter": "A", "text": "replication"}, {"letter": "B", "text": "accounting"}, {"letter": "C", "text": "authorization"}, {"letter": "D", "text": "authentication"}], "answer": "D"}, {"num": 61, "question": "In Active Directory Domain Services, an architectural element that consists of one or more domains that are part of the same contiguous namespace.", "options": [{"letter": "A", "text": "domain tree"}, {"letter": "B", "text": "domain clients"}, {"letter": "C", "text": "domain controller"}, {"letter": "D", "text": "forest root"}], "answer": "A"}, {"num": 62, "question": "If an administrator creates a domain tree in an Active Directory forest, and then creates a separate and different domain tree, what is the relationship between the two domain trees?", "options": [{"letter": "A", "text": "Single domain with multiple OUs"}, {"letter": "B", "text": "Completely separate entities with no trust"}, {"letter": "C", "text": "A single domain tree with multiple child domains"}, {"letter": "D", "text": "Same security entity as one Active Directory forest, bidirectional trust between domain trees"}], "answer": "D"}, {"num": 63, "question": "What is the PowerShell cmdlet for installing a domain controller to the domain \"adatum.com\"?", "options": [{"letter": "A", "text": "Install-windowsfeature -domainname \"adatum.com\""}, {"letter": "B", "text": "Install-AddsForest -DomainName \"adatum.com\""}, {"letter": "C", "text": "Install-addsdomaincontroller -domainname \"adatum.com\""}, {"letter": "D", "text": "Install-addsdomain -domainname \"adatum.com\""}], "answer": "B"}, {"num": 64, "question": "What administrative division in Active Directory is defined as a collection of subnets that have good connectivity between them to facilitate the replication process?", "options": [{"letter": "A", "text": "Forests"}, {"letter": "B", "text": "Locations"}, {"letter": "C", "text": "Domains"}, {"letter": "D", "text": "Sites"}], "answer": "D"}, {"num": 65, "question": "What is the fundamental component of the Active Directory architecture, functioning as the boundary for virtually all directory functions, including administration, access control, database management, and replication?", "options": [{"letter": "A", "text": "Workgroup"}, {"letter": "B", "text": "Browser"}, {"letter": "C", "text": "Domain"}, {"letter": "D", "text": "Server"}], "answer": "C"}, {"num": 66, "question": "What is the method for removing a domain controller in Windows Server 2012 R2?", "options": [{"letter": "A", "text": "Using the Remove Roles and Features Wizard"}, {"letter": "B", "text": "Manually Deleting the Domain Controller Files"}, {"letter": "C", "text": "Reinstalling the Server Operating System"}, {"letter": "D", "text": "Using the Active Directory Users and Computers Console"}], "answer": "A"}, {"num": 67, "question": "A set of network resources available for a group of users who can authenticate to the network to gain access to those resources.", "options": [{"letter": "A", "text": "browser"}, {"letter": "B", "text": "server"}, {"letter": "C", "text": "workgroup"}, {"letter": "D", "text": "domain"}], "answer": "D"}, {"num": 68, "question": "What determines the functional level of an Active Directory forest?", "options": [{"letter": "A", "text": "The amount of storage allocated to the domain"}, {"letter": "B", "text": "The number of users in the domain"}, {"letter": "C", "text": "The highest version of Windows Server on a domain controller"}, {"letter": "D", "text": "The lowest version of Windows Server on a domain controller"}], "answer": "D"}, {"num": 69, "question": "What is not a container, nor full-fledged security division and cannot have Group Policy settings applied directly to them?", "options": [{"letter": "A", "text": "Group"}, {"letter": "B", "text": "User"}, {"letter": "C", "text": "Policy"}, {"letter": "D", "text": "Owner"}], "answer": "A"}, {"num": 70, "question": "A Windows server with Active Directory Domain Services directory service installed. Each workstation computer joins the domain and is represented by a computer object. Administrators create user objects that represent human users. A domain differs from a workgroup because users log on to the domain once, rather than to each individual computer.", "options": [{"letter": "A", "text": "domain tree"}, {"letter": "B", "text": "file server"}, {"letter": "C", "text": "domain controller"}, {"letter": "D", "text": "member server"}], "answer": "C"}, {"num": 71, "question": "What is the command-line tool and syntax for determining whether a domain controller has been registered in DNS?", "options": [{"letter": "A", "text": "nslookup /query:<domain name> /type:srv"}, {"letter": "B", "text": "tracert <domain name> -h 30"}, {"letter": "C", "text": "dcdiag /test:registerindns /dnsdomain:<domain name> /v"}, {"letter": "D", "text": "ping <domain name> -t"}], "answer": "C"}, {"num": 72, "question": "A collection of subnets that have good connectivity between them.", "options": [{"letter": "A", "text": "site"}, {"letter": "B", "text": "forest"}, {"letter": "C", "text": "group"}, {"letter": "D", "text": "browser"}], "answer": "A"}, {"num": 73, "question": "In Active Directory Domain Services, the individual properties that combine to form an object.", "options": [{"letter": "A", "text": "attributes"}, {"letter": "B", "text": "methods"}, {"letter": "C", "text": "constraints"}, {"letter": "D", "text": "relationships"}], "answer": "A"}, {"num": 74, "question": "What is the next level of Active Directory container object within a domain?", "options": [{"letter": "A", "text": "Global catalog"}, {"letter": "B", "text": "Organizational unit"}, {"letter": "C", "text": "Shared folder"}, {"letter": "D", "text": "Directory schema"}], "answer": "B"}, {"num": 75, "question": "Active Directory keeps a naming convention for the domain that mirrors ______.", "options": [{"letter": "A", "text": "HTTP"}, {"letter": "B", "text": "FTP"}, {"letter": "C", "text": "SMTP"}, {"letter": "D", "text": "DNS"}], "answer": "D"}, {"num": 76, "question": "A directory service that Microsoft first introduced in Windows 2000 Server and has upgraded in each successive server operating system release, including Windows Server 2012 R2.", "options": [{"letter": "A", "text": "Microsoft Exchange Server"}, {"letter": "B", "text": "File Transfer Protocol (FTP) Server"}, {"letter": "C", "text": "Active Directory Domain Services (AD DS)"}, {"letter": "D", "text": "Windows Server Update Services (WSUS)"}, {"letter": "C", "text": "Active Directory Domain Services (AD DS)"}], "answer": "C"}, {"num": 77, "question": "An Active Directory Domain Services component that specifies the attributes each type of object can possess, the type of data that can be stored in each attribute, and the object's place in the directory tree.", "options": [{"letter": "A", "text": "directory schema"}, {"letter": "B", "text": "single-master replication"}, {"letter": "C", "text": "domain"}, {"letter": "D", "text": "client-server directory model"}], "answer": "A"}, {"num": 78, "question": "What is the PowerShell cmdlet and syntax for demoting a domain controller?", "options": [{"letter": "A", "text": "Read-Only Domain Controller (RODC)"}, {"letter": "B", "text": "Windows Server 2012 R2 now allows administrators to use PowerShell."}, {"letter": "C", "text": "Install-AddsForest -DomainName \"adatum.com\""}, {"letter": "D", "text": "Uninstall-ADDSDomainController -ForceRemoval LocalAdministratorPassword <password> -Force"}], "answer": "D"}, {"num": 79, "question": "What allows administrators to grant users in one domain access to resources of another domain within the same domain tree?", "options": [{"letter": "A", "text": "Bidirectional trust relationship between domains"}, {"letter": "B", "text": "Unidirectional trust relationship between domains"}, {"letter": "C", "text": "Domain isolation policy"}, {"letter": "D", "text": "Single sign-on authenticatio"}], "answer": "A"}, {"num": 80, "question": "The standard communications protocol for directory service products, including Active Directory Domain Services.", "options": [{"letter": "A", "text": "Lightweight Domain Access Protocol (LDAP)"}, {"letter": "B", "text": "Lightweight Directory Access Protocol (LDAP)"}, {"letter": "C", "text": "Local Data Access Protocol (LDAP)"}, {"letter": "D", "text": "Layered Directory Service Protocol (LDAP)"}], "answer": "B"}, {"num": 81, "question": "What is the key difference between groups and Organizational Units (OUs)?", "options": [{"letter": "A", "text": "Because groups are independent from domain structure, its members may be located anywhere in the domain or outside the domain."}, {"letter": "B", "text": "You cannot apply Group Policy settings directly to group objects."}, {"letter": "C", "text": "OUs are containers, whereas groups are not containers."}, {"letter": "D", "text": "There is essentially no difference between OUs and groups."}], "answer": "A"}, {"num": 82, "question": "An Active Directory functional level must be low enough to ensure interoperability between domain controllers running different versions of Windows Server. How does the functional level affect the AD forest?", "options": [{"letter": "A", "text": "Higher functional level means more efficient AD communication."}, {"letter": "B", "text": "Higher functional level means few Global Catalog errors."}, {"letter": "C", "text": "Lower functional level means fewer features available."}, {"letter": "D", "text": "Lower functional level means time to upgrade the lowest servers."}], "answer": "C"}, {"num": 83, "question": "What is the simplest way for administrators to upgrade their Active Directory Domain Services (AD DS) infrastructure to Windows Server 2012 R2?", "options": [{"letter": "A", "text": "Upgrade all existing down-level domain controllers (DCs) to Windows Server 2012 R2."}, {"letter": "B", "text": "In Server Manager, use the Active Directory Domain Services Configuration Wizard to update a DC."}, {"letter": "C", "text": "Add a new Windows Server 2012 R2 server to your existing Directory Services installation."}, {"letter": "D", "text": "Use Adprep.exe, included in the operating system."}], "answer": "C"}, {"num": 84, "question": "What is an important difference between groups and organizational units (OUs)?", "options": [{"letter": "A", "text": "An OU can represent the various divisions of your organization."}, {"letter": "B", "text": "Group membership can be a subset of an OU."}, {"letter": "C", "text": "OUs are a security entity."}, {"letter": "D", "text": "Group memberships are independent of the domain's tree structure."}], "answer": "D"}, {"num": 85, "question": "What is the default trust relationship between domains in one forest?", "options": [{"letter": "A", "text": "Two-way trust relationship between domain trees"}, {"letter": "B", "text": "By default, no trust relationship between domain trees"}, {"letter": "C", "text": "One-way trust relationship between domain trees"}, {"letter": "D", "text": "Each domain tree trusts the forest, but not between each other"}], "answer": "A"}, {"num": 86, "question": "What are the two basic classes of Active Directory objects?", "options": [{"letter": "A", "text": "Resource"}, {"letter": "B", "text": "Leaf"}, {"letter": "C", "text": "Domain"}, {"letter": "D", "text": "Container"}], "answer": "B,D"}, {"num": 87, "question": "What is the first domain installed in a new Active Directory forest called?", "options": [{"letter": "A", "text": "Forest root domain"}, {"letter": "B", "text": "Parent root domain"}, {"letter": "C", "text": "Domain tree root"}, {"letter": "D", "text": "Domain root"}], "answer": "A"}, {"num": 88, "question": "Which of the following is not true about an object's attributes?", "options": [{"letter": "A", "text": "Administrators must manually supply information for certain attributes."}, {"letter": "B", "text": "Every container object has, as an attribute, a list of all the other objects it contains."}, {"letter": "C", "text": "Leaf objects do not contain attributes."}, {"letter": "D", "text": "Active Directory automatically creates the globally unique identifier (GUID)."}], "answer": "C"}, {"num": 89, "question": "Which of the following items is a valid leaf object in Active Directory?", "options": [{"letter": "A", "text": "Domain"}, {"letter": "B", "text": "User"}, {"letter": "C", "text": "Application partition"}, {"letter": "D", "text": "OU"}], "answer": "B"}, {"num": 90, "question": "Which of the following does an Active Directory client use to locate objects in another domain?", "options": [{"letter": "A", "text": "DNS"}, {"letter": "B", "text": "Global Catalog"}, {"letter": "C", "text": "DHCP"}, {"letter": "D", "text": "Site Link"}], "answer": "B"}, {"num": 91, "question": "Is it possible to add AD DS on a computer running Server Core?", "options": [{"letter": "A", "text": "No, you require the full GUI installation of Windows Server 2012 R2."}, {"letter": "B", "text": "Yes, you use Dcpromo.exe and accompanying answer files."}, {"letter": "C", "text": "No, unless all servers are already running Windows 2012."}, {"letter": "D", "text": "Yes, you use PowerShell, by first installing AD DS role, and then promoting the server to a DC."}], "answer": "D"}, {"num": 92, "question": "What is required by DNS for Active Directory to function? Choose Two", "options": [{"letter": "A", "text": "Dynamic update support"}, {"letter": "B", "text": "DHCP forwarding support"}, {"letter": "C", "text": "SRV records support"}, {"letter": "D", "text": "Active Directory integration"}], "answer": "A,C"}, {"num": 93, "question": "Which of the following cannot contain multiple Active Directory domains?", "options": [{"letter": "A", "text": "organizational units"}, {"letter": "B", "text": "sites"}, {"letter": "C", "text": "trees"}, {"letter": "D", "text": "forests"}], "answer": "A,B"}, {"num": 94, "question": "What is the primary reason for creating different sites on an Active Directory network?", "options": [{"letter": "A", "text": "To create geographical divisions within the Active Directory"}, {"letter": "B", "text": "To provide another boundary when applying Group Policy settings (along with domains and OUs)"}, {"letter": "C", "text": "To provide a layer of access control between objects in differing sites"}, {"letter": "D", "text": "To control the amount of traffic passing over the relatively slow and expensive WAN links between locations"}], "answer": "D"}, {"num": 95, "question": "Who may join a computer to the domain?", "options": [{"letter": "A", "text": "only domain administrators may join a computer to the domain."}, {"letter": "B", "text": "anyone with a user account may join a computer to the domain."}, {"letter": "C", "text": "only the it department can join a computer to the domain."}, {"letter": "D", "text": "Members of the computer's local Administrators group may join the computer to the domain."}], "answer": "D"}, {"num": 96, "question": "What can be used to add, delete, or modify objects in Active Directory, in addition to modifying the schema if necessary?", "options": [{"letter": "A", "text": "Djoin"}, {"letter": "B", "text": "LDIFDE"}, {"letter": "C", "text": "Administrator"}, {"letter": "D", "text": "network accounts"}], "answer": "B"}, {"num": 97, "question": "What is a key benefit to using ADAC or the Active Directory Users and Computers console?", "options": [{"letter": "A", "text": "ADAC allows you to create new user accounts only."}, {"letter": "B", "text": "adac is primarily used for monitoring user activity."}, {"letter": "C", "text": "ADAC allows you to modify the properties of multiple users or multiple computers at once."}, {"letter": "D", "text": "adac provides a way to delete user accounts easily."}], "answer": "C"}, {"num": 98, "question": "What differences matter most in creating a single user versus multiple users?", "options": [{"letter": "A", "text": "Single user creation is often done from the graphical user interface (GUI), whereas creating multiple users typically requires using command-line tools."}, {"letter": "B", "text": "single user creation requires a database, while multiple users can be created without one."}, {"letter": "C", "text": "single user creation is faster than creating multiple users, which takes longer."}, {"letter": "D", "text": "single user creation is only possible through scripts, while multiple users can be created through the gui."}], "answer": "A"}, {"num": 99, "question": "What is the Windows PowerShell cmdlet syntax for creating a new computer object?", "options": [{"letter": "A", "text": "Create-computer -name <computer name> -location <site name>"}, {"letter": "B", "text": "New-ADComputer -Name <computer name> -path <distinguished name>"}, {"letter": "C", "text": "Add-newcomputer -name <computer name> -domain <domain name>"}, {"letter": "D", "text": "Register-computer -name <computer name> -group <group name>"}], "answer": "B"}, {"num": 100, "question": "When using Netdom.exe to join an account, you may add the parameter [/OU:OUDN]. If this parameter is left out, where is the object placed?", "options": [{"letter": "A", "text": "In the Users container"}, {"letter": "B", "text": "in the domain controllers container"}, {"letter": "C", "text": "In the Computers container"}, {"letter": "D", "text": "in the managed service accounts container"}], "answer": "C"}, {"num": 101, "question": "What is the Windows PowerShell cmdlet syntax for creating a new user account?", "options": [{"letter": "A", "text": "New-ADUser"}, {"letter": "B", "text": "header record"}, {"letter": "C", "text": "network accounts"}, {"letter": "D", "text": "New-user"}], "answer": "A"}, {"num": 102, "question": "Which of the following utilities do you use to perform an offline domain join?", "options": [{"letter": "A", "text": "administrator"}, {"letter": "B", "text": "ldifde"}, {"letter": "C", "text": "djoin"}, {"letter": "D", "text": "header record"}], "answer": "C"}, {"num": 103, "question": "Which of the following are the two built-in user accounts created automatically on a computer running Windows Server 2012 R2?", "options": [{"letter": "A", "text": "Administrator"}, {"letter": "B", "text": "Ldifde"}, {"letter": "C", "text": "Djoin"}, {"letter": "D", "text": "standard user"}], "answer": "A"}, {"num": 104, "question": "When using CSVDE, what is the first line of the text file that uses proper attribute names?", "options": [{"letter": "A", "text": "djoin"}, {"letter": "B", "text": "header record"}, {"letter": "C", "text": "administrator"}, {"letter": "D", "text": "network accounts"}], "answer": "B"}, {"num": 105, "question": "What is the primary means by which people access resources on an Active Directory Domain Service (AD DS) network?", "options": [{"letter": "A", "text": "By using a guest account"}, {"letter": "B", "text": "By connecting via a vpn"}, {"letter": "C", "text": "By having a user account"}, {"letter": "D", "text": "by accessing public wi-fi"}], "answer": "C"}, {"num": 106, "question": "Are typical, authenticated users able to create computer objects in an Active Directory?", "options": [{"letter": "A", "text": "Single user creation is often done from the graphical user interface (GUI), whereas creating multiple users typically requires using command-line tools."}, {"letter": "B", "text": "Members of the computer's local Administrators group may join the computer to the domain."}, {"letter": "C", "text": "ADAC allows you to modify the properties of multiple users or multiple computers at once."}, {"letter": "D", "text": "Yes, by default, users who are successfully authenticated to Active Directory are permitted to join up to ten workstations to the domain, thus creating up to 10 associated computer objects."}], "answer": "D"}, {"num": 107, "question": "Which of the following is not a type of user account that can be configured in Windows Server 2012 R2?", "options": [{"letter": "A", "text": "header record"}, {"letter": "B", "text": "ldifde"}, {"letter": "C", "text": "network accounts"}, {"letter": "D", "text": "djoin"}], "answer": "C"}, {"num": 108, "question": "What two graphical tools will help create either user or computer objects?", "options": [{"letter": "A", "text": "active directory users and groups and group policy management"}, {"letter": "B", "text": "Active Directory Administrative Center and Active Directory Users and Computer"}, {"letter": "C", "text": "windows powershell and command prompt"}, {"letter": "D", "text": "system configuration and task scheduler"}], "answer": "B"}, {"num": 109, "question": "You are preparing a new branch office with new computers. Unfortunately, the branch office network will still be down on the day you've planned to be there. You would like to join the computers to the domain without having to drive back later. What program can you run ahead of time to do this?", "options": [{"letter": "A", "text": "DCPROMO.EXE"}, {"letter": "B", "text": "DJOIN.EXE"}, {"letter": "C", "text": "CSVDE.EXE"}, {"letter": "D", "text": "LDIFDE.EXE"}], "answer": "B"}];
-let questions = [];
-let index = 0;
-let score = 0;
-let answers = [];
-function startQuiz(shuffle) {
-  questions = JSON.parse(JSON.stringify(originalQuestions));
-  if (shuffle) questions.sort(() => Math.random() - 0.5);
-  index = 0; score = 0; answers = [];
-  document.getElementById('startScreen').style.display = 'none';
-  document.getElementById('quizScreen').style.display = 'block';
-  showQuestion();
-}
-function showQuestion() {
-  const q = questions[index];
-  document.getElementById('progress').textContent = `Question ${index+1} of ${questions.length} | Score: ${score}`;
-  document.getElementById('question').textContent = `Q${q.num}. ${q.question}`;
-  const form = document.getElementById('options');
-  form.innerHTML = '';
-  const isMulti = q.answer.includes(',');
-  q.options.forEach(opt => {
-    const label = document.createElement('label');
-    label.className = 'option';
-    const input = document.createElement('input');
-    input.type = isMulti ? 'checkbox' : 'radio';
-    input.name = 'answer';
-    input.value = opt.letter;
-    label.appendChild(input);
-    label.appendChild(document.createTextNode(` ${opt.letter}. ${opt.text}`));
-    form.appendChild(label);
-  });
-  document.getElementById('feedback').style.display='none';
-  document.getElementById('checkBtn').style.display='inline-block';
-  document.getElementById('nextBtn').style.display='none';
-}
-function selectedAnswer() {
-  return Array.from(document.querySelectorAll('#options input:checked')).map(x => x.value).sort().join(',');
-}
-function answerText(q) {
-  const letters = q.answer.split(',');
-  return letters.map(l => `${l}. ${(q.options.find(o => o.letter===l)||{text:''}).text}`).join(' | ');
-}
-function checkAnswer() {
-  const q = questions[index];
-  const sel = selectedAnswer();
-  const fb = document.getElementById('feedback');
-  if (!sel) { alert('Choose an answer first.'); return; }
-  const correct = sel === q.answer.split(',').sort().join(',');
-  if (correct) { score++; fb.className='feedback correct'; fb.textContent = `Correct ✅ Answer: ${answerText(q)}`; }
-  else { fb.className='feedback wrong'; fb.textContent = `Wrong ❌ Correct answer: ${answerText(q)}`; }
-  answers.push({num:q.num, question:q.question, selected:sel, correct:q.answer, isCorrect:correct});
-  fb.style.display='block';
-  document.getElementById('checkBtn').style.display='none';
-  document.getElementById('nextBtn').style.display='inline-block';
-}
-function nextQuestion() {
-  index++;
-  if (index >= questions.length) return showResults();
-  showQuestion();
-}
-function showResults() {
-  document.getElementById('quizScreen').style.display='none';
-  const pct = Math.round((score/questions.length)*100);
-  let html = `<h1>Results</h1><h2>${score} / ${questions.length} (${pct}%)</h2>`;
-  html += '<button class="primary" onclick="location.reload()">Restart</button><h2>Review</h2>';
-  answers.forEach(a => {
-    html += `<div class="resultItem"><b>Q${a.num}</b> - ${a.isCorrect?'✅':'❌'} Your answer: ${a.selected} | Correct: ${a.correct}</div>`;
-  });
-  const rs = document.getElementById('resultScreen');
-  rs.innerHTML = html;
-  rs.style.display='block';
-}
-</script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OS Lessons 4, 13 & 14 Self-Test Quiz</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #f7f7fb;
+        color: #222;
+      }
+      .container {
+        max-width: 900px;
+        margin: 30px auto;
+        background: white;
+        padding: 28px;
+        border-radius: 18px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+      h1 {
+        margin-top: 0;
+      }
+      .progress {
+        margin: 15px 0;
+        font-weight: bold;
+      }
+      .question {
+        font-size: 20px;
+        font-weight: bold;
+        margin: 22px 0;
+        line-height: 1.35;
+      }
+      .option {
+        display: block;
+        padding: 12px;
+        margin: 8px 0;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      .option:hover {
+        background: #f1f1f8;
+      }
+      button {
+        padding: 12px 18px;
+        border: 0;
+        border-radius: 10px;
+        cursor: pointer;
+        margin: 8px 6px 8px 0;
+        font-weight: bold;
+      }
+      .primary {
+        background: #111827;
+        color: white;
+      }
+      .secondary {
+        background: #e5e7eb;
+      }
+      .feedback {
+        padding: 14px;
+        border-radius: 12px;
+        margin-top: 15px;
+        font-weight: bold;
+        display: none;
+      }
+      .correct {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #86efac;
+      }
+      .wrong {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fca5a5;
+      }
+      .small {
+        color: #555;
+        font-size: 14px;
+      }
+      .resultItem {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .dark-toggle {
+        position: fixed;
+        top: 12px;
+        right: 12px;
+        z-index: 1000;
+      }
+      .dark-toggle button {
+        border: none;
+        border-radius: 999px;
+        padding: 10px 14px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      .mobile-icon {
+        display: none;
+      }
+      @media (max-width: 700px) {
+        .desktop-text {
+          display: none;
+        }
+        .mobile-icon {
+          display: inline;
+        }
+      }
+      body.dark {
+        background: #111827;
+        color: #f3f4f6;
+      }
+      body.dark .container {
+        background: #1f2937;
+        color: #f3f4f6;
+      }
+      body.dark .option {
+        border-color: #4b5563;
+      }
+      body.dark .option:hover {
+        background: #374151;
+      }
+      body.dark .secondary {
+        background: #374151;
+        color: #fff;
+      }
+      body.dark .small {
+        color: #cbd5e1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dark-toggle">
+      <button onclick="toggleDark()">
+        <span class="desktop-text">🌙 Dark Mode</span>
+        <span class="mobile-icon">🌙</span>
+      </button>
+    </div>
+
+    <div class="container">
+      <h1>OS Lessons 4, 13 & 14 Self-Test Quiz</h1>
+      <p class="small">
+        109 questions. Choose your answer, click Check Answer, then the correct
+        answer appears immediately. Your final score appears at the end.
+      </p>
+      <div id="startScreen">
+        <button class="primary" onclick="startQuiz(false)">
+          Start in order
+        </button>
+        <button class="secondary" onclick="startQuiz(true)">
+          Shuffle questions
+        </button>
+      </div>
+      <div id="quizScreen" style="display: none">
+        <div class="progress" id="progress"></div>
+        <div class="question" id="question"></div>
+        <form id="options"></form>
+        <div id="feedback" class="feedback"></div>
+        <button class="primary" id="checkBtn" onclick="checkAnswer()">
+          Check Answer
+        </button>
+        <button
+          class="secondary"
+          id="nextBtn"
+          onclick="nextQuestion()"
+          style="display: none"
+        >
+          Next
+        </button>
+      </div>
+      <div id="resultScreen" style="display: none"></div>
+    </div>
+    <script>
+      const originalQuestions = [
+        {
+          num: 1,
+          question:
+            "If massive shares were split across multiple servers, what is the best way to make them appear as a single, unified directory tree?",
+          options: [
+            {
+              letter: "A",
+              text: "Windows Server 2012 R2 Distributed File System",
+            },
+            {
+              letter: "B",
+              text: "Windows Server 2012 R2 File Replication Service",
+            },
+            { letter: "C", text: "Windows Server 2012 R2 Storage Spaces" },
+            {
+              letter: "D",
+              text: "Windows Server 2012 R2 Network Load Balancing",
+            },
+          ],
+          answer: "A",
+        },
+        {
+          num: 2,
+          question:
+            "Users generally do not understand the concept of network drive sharing. They only know they can store their files \"on my F: drive\" and are unaware that someone else's F: drive might point to a different folder. What do we call this concept of having a drive letter associated to a user's network folder?",
+          options: [
+            { letter: "A", text: "SMB Share-Quick" },
+            { letter: "B", text: "SMB Share-Advanced" },
+            { letter: "C", text: "Mapping drives" },
+            { letter: "D", text: "NFS Share-Advanced" },
+          ],
+          answer: "C",
+        },
+        {
+          num: 3,
+          question:
+            "What are an administrator's choices for managing file permissions on a drive formatted as FAT32?",
+          options: [
+            {
+              letter: "A",
+              text: "Permissions cannot be managed on FAT32 drives.",
+            },
+            {
+              letter: "B",
+              text: "If the drive is a network share, then Share permissions can be used.",
+            },
+            { letter: "C", text: "Only read-only permissions can be applied." },
+            {
+              letter: "D",
+              text: "File permissions can only be managed through third-party tools.",
+            },
+          ],
+          answer: "B",
+        },
+        {
+          num: 4,
+          question:
+            "When configuring file and share access, why should you assign permissions?",
+          options: [
+            { letter: "A", text: "File permissions" },
+            {
+              letter: "B",
+              text: "If the drive is a network share, then Share permissions can be used.",
+            },
+            {
+              letter: "C",
+              text: "To improve data security by granting file and share access only to those users who need it",
+            },
+            {
+              letter: "D",
+              text: "access control entries; access control list",
+            },
+          ],
+          answer: "C",
+        },
+        {
+          num: 5,
+          question:
+            "With the Volume Shadow Copy Service enabled, what does the system do if the maximum number of copies supported by Windows Server 2012 R2 is reached?",
+          options: [
+            { letter: "A", text: "The system stops creating new copies." },
+            {
+              letter: "B",
+              text: "The system overwrites the most recent copy.",
+            },
+            {
+              letter: "C",
+              text: "The system archives the oldest copy instead.",
+            },
+            {
+              letter: "D",
+              text: "The system copies, and then deletes the oldest copy.",
+            },
+          ],
+          answer: "D",
+        },
+        {
+          num: 6,
+          question:
+            "Using File and Storage Services in Server Manager, you will create a new share. The New Share Wizard prompts you for a profile. You need a profile that provides basic NFS sharing with authentication and permissions. Which do you choose?",
+          options: [
+            { letter: "A", text: "SMB Share-Quick" },
+            { letter: "B", text: "NTFS Permissions" },
+            { letter: "C", text: "NFS Share-Quick" },
+            { letter: "D", text: "NFS Share-Advanced" },
+          ],
+          answer: "C",
+        },
+        {
+          num: 7,
+          question:
+            "You know that installing Windows Server 2012 R2 includes Storage Services by default. Why can't you then create and manage SMB shares using Server Manager? What must be installed first?",
+          options: [
+            { letter: "A", text: "File Server role service" },
+            { letter: "B", text: "Network Adapter configuration" },
+            { letter: "C", text: "Active Directory Domain Services" },
+            { letter: "D", text: "Remote Desktop Services" },
+          ],
+          answer: "A",
+        },
+        {
+          num: 8,
+          question:
+            "Using File and Storage Services in Server Manager, you will create a new share. The New Share Wizard prompts you for a profile. You need a profile that provides NFS sharing with authentication and permissions, plus access to services provided by File Server Resource Manager. Which do you choose?",
+          options: [
+            { letter: "A", text: "SMB Share-Quick" },
+            { letter: "B", text: "SMB Share-Advanced" },
+            { letter: "C", text: "NFS Share-Quick" },
+            { letter: "D", text: "NFS Share-Advanced" },
+          ],
+          answer: "D",
+        },
+        {
+          num: 9,
+          question:
+            "You grant a user the NTFS permissions needed to access a file. You then move the file to a different location. Is the user still able to access the file?",
+          options: [
+            {
+              letter: "A",
+              text: "Yes, when you move the file, its permissions go with it.",
+            },
+            {
+              letter: "B",
+              text: "No, moving the file resets its permissions.",
+            },
+            {
+              letter: "C",
+              text: "Yes, but only if the destination folder has the same permissions.",
+            },
+            { letter: "D", text: "No, the user must be granted access again." },
+          ],
+          answer: "A",
+        },
+        {
+          num: 10,
+          question:
+            "To simplify the administration process, you should always assign permissions to ____ rather than to individuals.",
+          options: [
+            { letter: "A", text: "security groups" },
+            { letter: "B", text: "individual accounts" },
+            { letter: "C", text: "temporary users" },
+            { letter: "D", text: "public access" },
+          ],
+          answer: "A",
+        },
+        {
+          num: 11,
+          question:
+            "Using File and Storage Services in Server Manager, you will create a new share. The New Share Wizard prompts you for a profile. You need a profile that provides SMB sharing with settings suitable for Hyper-V and other applications. Which do you choose?",
+          options: [
+            { letter: "A", text: "SMB Share-Quick" },
+            { letter: "B", text: "SMB Share-Advanced" },
+            { letter: "C", text: "SMB Share-Applications" },
+            {
+              letter: "D",
+              text: "File and Storage Services in Server Manager",
+            },
+          ],
+          answer: "C",
+        },
+        {
+          num: 12,
+          question:
+            "Which of these is NOT one of the Windows permission systems?",
+          options: [
+            { letter: "A", text: "Work Folders" },
+            { letter: "B", text: "File permissions" },
+            { letter: "C", text: "Access policies" },
+            { letter: "D", text: "Volume Shadow Copies" },
+          ],
+          answer: "B",
+        },
+        {
+          num: 13,
+          question:
+            "What is the Windows Server 2012 R2 feature that enables you to maintain previous versions of files on a server, so that if users accidentally delete or overwrite a file, they can access a copy?",
+          options: [
+            { letter: "A", text: "Work Folders" },
+            { letter: "B", text: "NTFS permissions" },
+            { letter: "C", text: "File permissions" },
+            { letter: "D", text: "Volume Shadow Copies" },
+          ],
+          answer: "D",
+        },
+        {
+          num: 14,
+          question:
+            "Using File and Storage Services in Server Manager, you will create a new share. The New Share Wizard prompts you for a profile. You need a profile that provides SMB sharing with full share and NTFS permissions and access to services provided by File Server Resource Manager. Which do you choose?",
+          options: [
+            { letter: "A", text: "SMB Share-Quick" },
+            { letter: "B", text: "SMB Share-Advanced" },
+            { letter: "C", text: "NFS Share-Quick" },
+            { letter: "D", text: "NFS Share-Advanced" },
+          ],
+          answer: "B",
+        },
+        {
+          num: 15,
+          question:
+            "Which of the following permission systems is responsible for controlling access to files and folders stored on the local disk volume?",
+          options: [
+            { letter: "A", text: "Work Folders" },
+            { letter: "B", text: "NTFS permissions" },
+            { letter: "C", text: "NFS Share-Quick" },
+            { letter: "D", text: "Volume Shadow Copies" },
+          ],
+          answer: "B",
+        },
+        {
+          num: 16,
+          question:
+            "After applying permissions to a group that already inherits permissions, you are concerned about the effective access. Rather than examine and evaluate all possible permission sources, where can you check the effective access more easily?",
+          options: [
+            { letter: "A", text: "Reviewing the group policy settings." },
+            {
+              letter: "B",
+              text: "Clicking the Effective Access tab on the Advanced Security Settings dialog box.",
+            },
+            { letter: "C", text: "Checking the user account properties." },
+            {
+              letter: "D",
+              text: "Using command line tools to list permissions.",
+            },
+          ],
+          answer: "B",
+        },
+        {
+          num: 17,
+          question:
+            "Knowing how permissions can be cumulative or override each other is an important factor in understanding what?",
+          options: [
+            { letter: "A", text: "File permissions" },
+            { letter: "B", text: "NTFS permissions" },
+            { letter: "C", text: "Mapping drives" },
+            { letter: "D", text: "Understanding effective access" },
+          ],
+          answer: "D",
+        },
+        {
+          num: 18,
+          question:
+            "The company's Board of Directors would like you to create private folders, which users should not know exist. While you are creating the new network share for their folders, which New Share option should you choose to prevent users from seeing the folders?",
+          options: [
+            { letter: "A", text: "SMB Share-Advanced" },
+            { letter: "B", text: "File permissions" },
+            { letter: "C", text: "Enable access-based enumeration" },
+            {
+              letter: "D",
+              text: "File and Storage Services in Server Manager",
+            },
+          ],
+          answer: "C",
+        },
+        {
+          num: 19,
+          question:
+            "Windows Server 2012 R2 supports two types of folder shares. What are those two types?",
+          options: [
+            { letter: "A", text: "Local File System and Remote Access" },
+            { letter: "B", text: "Cloud Storage and External Drives" },
+            { letter: "C", text: "File Transfer Protocol and WebDAV" },
+            {
+              letter: "D",
+              text: "Network File System and Server Message Blocks",
+            },
+          ],
+          answer: "D",
+        },
+        {
+          num: 20,
+          question:
+            "What service allows users to store files on a network file server, which can be accessed from multiple workstations or devices?",
+          options: [
+            { letter: "A", text: "Work Folders" },
+            { letter: "B", text: "File Permissions" },
+            { letter: "C", text: "Offline Folders" },
+            { letter: "D", text: "Volume Shadow Copies" },
+          ],
+          answer: "A",
+        },
+        {
+          num: 21,
+          question:
+            "What is the primary tool in Windows Server 2012 R2 to take control of the shares on all your disks on all your servers and exercise granular control over their properties?",
+          options: [
+            { letter: "A", text: "Disk Management Tool" },
+            { letter: "B", text: "Task Scheduler" },
+            { letter: "C", text: "Windows PowerShell" },
+            {
+              letter: "D",
+              text: "File and Storage Services in Server Manager",
+            },
+          ],
+          answer: "D",
+        },
+        {
+          num: 22,
+          question:
+            "What is the maximum number of shadow copies supported by Windows Server 2012 R2?",
+          options: [
+            { letter: "A", text: "32" },
+            { letter: "B", text: "64" },
+            { letter: "C", text: "512" },
+            { letter: "D", text: "256" },
+          ],
+          answer: "B",
+        },
+        {
+          num: 23,
+          question:
+            "Using File and Storage Services in Server Manager, you will create a new share. The New Share Wizard prompts you for a profile. You need a profile for basic SMB sharing with full share and NTFS permissions. Which do you choose?",
+          options: [
+            { letter: "A", text: "SMB Share-Quick" },
+            { letter: "B", text: "SMB Share-Advanced" },
+            { letter: "C", text: "NFS Share-Quick" },
+            { letter: "D", text: "NFS Share-Advanced" },
+          ],
+          answer: "A",
+        },
+        {
+          num: 24,
+          question:
+            "When you manage permissions in any of the Windows Server 2012 R2 permission systems, you are actually creating and modifying the _______ in an _______.",
+          options: [
+            { letter: "A", text: "user roles; permission matrix" },
+            { letter: "B", text: "file attributes; metadata" },
+            { letter: "C", text: "security tokens; user profiles" },
+            {
+              letter: "D",
+              text: "access control entries; access control list",
+            },
+          ],
+          answer: "D",
+        },
+        {
+          num: 25,
+          question:
+            "Which of the following statements about permissions are true?",
+          options: [
+            {
+              letter: "A",
+              text: "All permissions must be granted to every user for security reasons.",
+            },
+            {
+              letter: "B",
+              text: "Permissions can be ignored if the user is an administrator.",
+            },
+            {
+              letter: "C",
+              text: "ACLs are composed of ACEs.; Basic permissions are composed of advanced permissions.; All permissions are stored as part of the protected resource.",
+            },
+            {
+              letter: "D",
+              text: "Permissions are only applicable to network resources and not local files.",
+            },
+          ],
+          answer: "C",
+        },
+        {
+          num: 26,
+          question:
+            "Which of the following sets of permissions is responsible for controlling access to files and folders stored on a local disk volume?",
+          options: [
+            { letter: "A", text: "NTFS permissions" },
+            { letter: "B", text: "Group permissions" },
+            { letter: "C", text: "Share permissions" },
+            { letter: "D", text: "Explicit permissions" },
+          ],
+          answer: "A",
+        },
+        {
+          num: 27,
+          question:
+            "Which of the following terms describes the process of granting users access to file server shares by reading their permissions?",
+          options: [
+            { letter: "A", text: "Authentication" },
+            { letter: "B", text: "Authorization" },
+            { letter: "C", text: "Enumeration" },
+            { letter: "D", text: "Assignment" },
+          ],
+          answer: "B",
+        },
+        {
+          num: 28,
+          question:
+            "Which of the following statements is not true in reference to resource ownership?",
+          options: [
+            {
+              letter: "A",
+              text: "ACLs are composed of ACEs.; Basic permissions are composed of advanced permissions.; All permissions are stored as part of the protected resource.",
+            },
+            {
+              letter: "B",
+              text: "Inherited permissions take precedence over explicit permissions.",
+            },
+            {
+              letter: "C",
+              text: "It is possible to lock out a file or folder by assigning a combination of permissions that permits access to no one at all, including the owner of the file or folder.",
+            },
+            {
+              letter: "D",
+              text: "The security principal in file system permission assignments is the person to whom the permissions are assigned.",
+            },
+          ],
+          answer: "C",
+        },
+        {
+          num: 29,
+          question:
+            "If massive shares were split across multiple servers, what is the best way to make them appear as a single, unified directory tree?",
+          options: [
+            {
+              letter: "A",
+              text: "A cloud storage solution that does not integrate with local servers.",
+            },
+            {
+              letter: "B",
+              text: "A simple file share that does not require any server configuration.",
+            },
+            {
+              letter: "C",
+              text: "A legacy file system that cannot handle multiple servers.",
+            },
+            {
+              letter: "D",
+              text: "Windows Server 2012 Distributed File System",
+            },
+          ],
+          answer: "D",
+        },
+        {
+          num: 30,
+          question:
+            "Which of the following are tasks you can perform by using the quotas in File Server Resource Manager but can't perform by using NTFS quotas?",
+          options: [
+            {
+              letter: "A",
+              text: "Send an email message to an administrator when users exceed their limits.",
+            },
+            {
+              letter: "B",
+              text: "Specify different storage limits for each user.",
+            },
+            {
+              letter: "C",
+              text: "Prevent users from consuming storage space on a volume beyond their allotted limit.",
+            },
+            {
+              letter: "D",
+              text: "Generate warnings to users when they approach their allotted storage limit.",
+            },
+          ],
+          answer: "A,B,D",
+        },
+        {
+          num: 31,
+          question:
+            "What is a key reason for assigning permissions when configuring file and share access?",
+          options: [
+            {
+              letter: "A",
+              text: "Allows all users unrestricted access to all files and shares.",
+            },
+            {
+              letter: "B",
+              text: "Increases the complexity of file management by removing user access controls.",
+            },
+            {
+              letter: "C",
+              text: "Improves data security, granting file and share access only to the users who need it.",
+            },
+            {
+              letter: "D",
+              text: "Reduces the need for backups by allowing open access to all data.",
+            },
+          ],
+          answer: "C",
+        },
+        {
+          num: 32,
+          question:
+            "You are deciding which file system to use. You need NTFS permission system support. You don't presently need encryption or compression, but might at a later date. What file system is your best choice?",
+          options: [
+            {
+              letter: "A",
+              text: "A proprietary file system that does not support NTFS permissions.",
+            },
+            {
+              letter: "B",
+              text: "ExFAT file system which is optimized for flash drives.",
+            },
+            {
+              letter: "C",
+              text: "FAT32 file system which supports encryption and compression.",
+            },
+            { letter: "D", text: "The traditional NTFS file system" },
+          ],
+          answer: "D",
+        },
+        {
+          num: 33,
+          question:
+            "Which of the following is the best description of a security principal?",
+          options: [
+            {
+              letter: "A",
+              text: "the person granting permissions to network users",
+            },
+            { letter: "B", text: "the network resource receiving permissions" },
+            {
+              letter: "C",
+              text: "a collection of individual special permissions",
+            },
+            { letter: "D", text: "an object that assigns permissions" },
+          ],
+          answer: "D",
+        },
+        {
+          num: 34,
+          question:
+            "Knowing how permissions can be cumulative or override each other is an important factor in understanding what?",
+          options: [
+            { letter: "A", text: "Special permissions" },
+            { letter: "B", text: "Troubleshoot" },
+            { letter: "C", text: "Auditing" },
+            { letter: "D", text: "Effective access" },
+          ],
+          answer: "D",
+        },
+        {
+          num: 35,
+          question:
+            "In the Windows Server 2012 R2 NTFS permission system, combinations of advanced permissions are also known as _______ permissions. (Choose all that apply.)",
+          options: [
+            { letter: "A", text: "Special" },
+            { letter: "B", text: "Basic" },
+            { letter: "C", text: "Share" },
+            { letter: "D", text: "Standard" },
+          ],
+          answer: "B,D",
+        },
+        {
+          num: 36,
+          question:
+            "Which of the following statements about effective access is not true?",
+          options: [
+            {
+              letter: "A",
+              text: "Inherited permissions can be modified but explicit permissions cannot.",
+            },
+            {
+              letter: "B",
+              text: "Inherited permissions take precedence over explicit permissions.",
+            },
+            {
+              letter: "C",
+              text: "Permissions can only be assigned to groups, not individual users.",
+            },
+            {
+              letter: "D",
+              text: "Explicit permissions are always more secure than inherited permissions.",
+            },
+          ],
+          answer: "B",
+        },
+        {
+          num: 37,
+          question:
+            "Which of the following statements best describes the role of the security principal in file system permission assignments?",
+          options: [
+            {
+              letter: "A",
+              text: "The security principal in file system permission assignments is the only person who can access a file that has no permissions assigned to it.",
+            },
+            {
+              letter: "B",
+              text: "The security principal in file system permission assignments is the person responsible for creating permission policies.",
+            },
+            {
+              letter: "C",
+              text: "The security principal in file system permission assignments is the person assigning the permissions.",
+            },
+            {
+              letter: "D",
+              text: "The security principal in file system permission assignments is the person to whom the permissions are assigned.",
+            },
+          ],
+          answer: "D",
+        },
+        {
+          num: 38,
+          question:
+            "A list of all the objects in an Active Directory Domain Services forest and a subset of each object's attributes, used by domain controllers to locate and access the resources of other domains in the same forest.",
+          options: [
+            { letter: "A", text: "database catalog" },
+            { letter: "B", text: "global directory" },
+            { letter: "C", text: "global catalog" },
+            { letter: "D", text: "database directory" },
+          ],
+          answer: "C",
+        },
+        {
+          num: 39,
+          question: "When is an Active Directory site topology created?",
+          options: [
+            {
+              letter: "A",
+              text: "Site topology is started upon initial installation of the Active Directory.",
+            },
+            {
+              letter: "B",
+              text: "Site topology starts when you finalize the links and subnets configuration.",
+            },
+            {
+              letter: "C",
+              text: "Creation of sites and its topology is dependent on link costs.",
+            },
+            {
+              letter: "D",
+              text: "Site topology is manually configured dependent on WAN bandwidth and transmission speed.",
+            },
+          ],
+          answer: "D",
+        },
+        {
+          num: 40,
+          question: "What is an important difference between groups and OUs?",
+          options: [
+            { letter: "A", text: "OUs can have nested groups within them." },
+            {
+              letter: "B",
+              text: "Group memberships are independent of the domain's tree structure.",
+            },
+            { letter: "C", text: "Groups cannot span multiple domains." },
+            {
+              letter: "D",
+              text: "Groups can only contain users from the same OU.",
+            },
+          ],
+          answer: "B",
+        },
+        {
+          num: 41,
+          question:
+            "What is a container object that functions in a subordinate capacity to a domain, and still inherits policies and permissions from its parent objects?",
+          options: [
+            { letter: "A", text: "Organizational unit" },
+            { letter: "B", text: "Domain controller" },
+            { letter: "C", text: "Leaf object" },
+            { letter: "D", text: "Shared folder" },
+          ],
+          answer: "A",
+        },
+        {
+          num: 42,
+          question:
+            "In Active Directory Domain Services, an object, such as a domain or organizational unit, that has leaf objects or other container objects as its subordinates.",
+          options: [
+            { letter: "A", text: "leaf object" },
+            { letter: "B", text: "domain" },
+            { letter: "C", text: "container object" },
+            { letter: "D", text: "group object" },
+          ],
+          answer: "C",
+        },
+        {
+          num: 43,
+          question:
+            "What is the process of granting the user access only to the resources he or she is permitted to use?",
+          options: [
+            { letter: "A", text: "Authentication" },
+            { letter: "B", text: "Authorization" },
+            { letter: "C", text: "Accountability" },
+            { letter: "D", text: "Replication" },
+          ],
+          answer: "B",
+        },
+        {
+          num: 44,
+          question:
+            "An Active Directory _____ consists of one or more separate domain trees.",
+          options: [
+            { letter: "A", text: "forest" },
+            { letter: "B", text: "network" },
+            { letter: "C", text: "subnet" },
+            { letter: "D", text: "cluster" },
+          ],
+          answer: "A",
+        },
+        {
+          num: 45,
+          question:
+            "In Active Directory Domain Services, an object, such as a user or computer, which is incapable of containing any other object.",
+          options: [
+            { letter: "A", text: "schema object" },
+            { letter: "B", text: "leaf object" },
+            { letter: "C", text: "container object" },
+            { letter: "D", text: "attribute object" },
+          ],
+          answer: "B",
+        },
+        {
+          num: 46,
+          question:
+            "In Active Directory Domain Services, a domain controller that supports only incoming replication traffic.",
+          options: [
+            { letter: "A", text: "Backup Domain Controller (bdc)" },
+            { letter: "B", text: "Primary domain controller (pdc) emulator" },
+            { letter: "C", text: "Read-Only Domain Controller (RODC)" },
+            { letter: "D", text: "Directory Access Protocol (DAP)" },
+          ],
+          answer: "C",
+        },
+        {
+          num: 47,
+          question:
+            "What is the process by which domain controllers communicate by sending database information to each other to stay synchronized?",
+          options: [
+            { letter: "A", text: "Authorization" },
+            { letter: "B", text: "Transcription" },
+            { letter: "C", text: "Recovery" },
+            { letter: "D", text: "Replication" },
+          ],
+          answer: "D",
+        },
+        {
+          num: 48,
+          question:
+            "What defines what objects exist as well as what attributes are associated with any object in the Active Directory?",
+          options: [
+            { letter: "A", text: "Active Directory schema" },
+            { letter: "B", text: "Active directory global directory" },
+            { letter: "C", text: "Active directory root user" },
+            { letter: "D", text: "Schema master" },
+          ],
+          answer: "A",
+        },
+        {
+          num: 49,
+          question:
+            "Which of the following features allows you to create virtual machines on a leased cloud resource?",
+          options: [
+            { letter: "A", text: "Platform as a Service (PaaS)" },
+            { letter: "B", text: "Infrastructure as a Service (IaaS)" },
+            { letter: "C", text: "Software as a Service (SaaS)" },
+            { letter: "D", text: "Network as a Service (NaaS)" },
+          ],
+          answer: "B",
+        },
+        {
+          num: 50,
+          question:
+            "A technique in which duplicate copies of a file are updated on a regular basis, no matter which copy changes. For example, if a file is duplicated on four different servers, a user can access any of the four copies and modify the file as needed. The replication engine uses the changes made to the modified copy to update the other three copies. Compare to single master replication.",
+          options: [
+            { letter: "A", text: "authorization" },
+            { letter: "B", text: "multiple-master replication" },
+            { letter: "C", text: "single-master replication" },
+            { letter: "D", text: "directory schema" },
+          ],
+          answer: "B",
+        },
+        {
+          num: 51,
+          question:
+            "What special DNS resource record enables clients to locate domain controllers and other vital AD DS services?",
+          options: [
+            { letter: "A", text: "TTL" },
+            { letter: "B", text: "SPF" },
+            { letter: "C", text: "SRV" },
+            { letter: "D", text: "PTR" },
+          ],
+          answer: "C",
+        },
+        {
+          num: 52,
+          question:
+            "A communications protocol specified in the X.500 standard. It is also the progenitor of the Lightweight Directory Access Protocol (LDAP).",
+          options: [
+            { letter: "A", text: "Active Directory Domain Services (AD DS)" },
+            {
+              letter: "B",
+              text: "Directory operational binding management protocol",
+            },
+            { letter: "C", text: "Directory Access Protocol (DAP)" },
+            { letter: "D", text: "Read-Only Domain Controller (RODC)" },
+          ],
+          answer: "C",
+        },
+        {
+          num: 53,
+          question:
+            "Which of the following features allows you to install AD DS on a virtual machine that is located in the cloud?",
+          options: [
+            { letter: "A", text: "Pci Dss" },
+            { letter: "B", text: "Google App Engine" },
+            { letter: "C", text: "Sql Azure" },
+            { letter: "D", text: "Windows Azure" },
+          ],
+          answer: "D",
+        },
+        {
+          num: 54,
+          question: "What does LDAP stand for?",
+          options: [
+            { letter: "A", text: "Lightweight Data Access Protocol (LDAP)" },
+            { letter: "B", text: "Local Directory Access Protocol (LDAP)" },
+            {
+              letter: "C",
+              text: "Lightweight Directory Access Protocol (LDAP)",
+            },
+            { letter: "D", text: "Layered Directory Access Protocol (LDAP)" },
+          ],
+          answer: "C",
+        },
+        {
+          num: 55,
+          question:
+            "What type of Active Directory replication minimizes problems in database management over slow WAN links?",
+          options: [
+            { letter: "A", text: "Global catalog" },
+            { letter: "B", text: "Directory schema" },
+            { letter: "C", text: "Multiple-master replication" },
+            { letter: "D", text: "Single-master replication" },
+          ],
+          answer: "C",
+        },
+        {
+          num: 56,
+          question:
+            "A technique in which duplicate copies of a file are updated on a regular basis from one master copy. For example, if a file is duplicated on four different servers, users can modify one copy and the replication engine propagates the changes to the other three copies. Compare with multiplemaster replication.",
+          options: [
+            { letter: "A", text: "multiserver replication" },
+            { letter: "B", text: "multiple-master replication" },
+            { letter: "C", text: "single-master replication" },
+            { letter: "D", text: "multi-master replication" },
+          ],
+          answer: "C",
+        },
+        {
+          num: 57,
+          question:
+            "In Active Directory Domain Services, the first domain created in a forest.",
+          options: [
+            {
+              letter: "A",
+              text: "same security entity as one active directory forest, bidirectional trust between domain trees",
+            },
+            { letter: "B", text: "tree root domain" },
+            { letter: "C", text: "forest root domain" },
+            { letter: "D", text: "parent root domain" },
+          ],
+          answer: "C",
+        },
+        {
+          num: 58,
+          question:
+            "For Server Core installations, how does Windows Server 2012 R2 differ from Windows Server 2008 when installing the AD DS role and promoting the system to a domain controller?",
+          options: [
+            {
+              letter: "A",
+              text: "Windows Server 2012 R2 requires a GUI for installation.",
+            },
+            {
+              letter: "B",
+              text: "Windows Server 2012 R2 now allows administrators to use PowerShell.",
+            },
+            {
+              letter: "C",
+              text: "Windows Server 2012 R2 has no changes from 2008.",
+            },
+            {
+              letter: "D",
+              text: "Windows Server 2012 R2 does not support domain controllers.",
+            },
+          ],
+          answer: "B",
+        },
+        {
+          num: 59,
+          question: "What is the global catalog?",
+          options: [
+            { letter: "A", text: "A security policy for the domain" },
+            { letter: "B", text: "A backup of the Active Directory database" },
+            { letter: "C", text: "An index of all AD DS objects in a forest" },
+            { letter: "D", text: "A list of all users in the domain" },
+          ],
+          answer: "C",
+        },
+        {
+          num: 60,
+          question:
+            "The process by which Windows Server 2012 R2 verifies that the user matches the user account employed to gain access.",
+          options: [
+            { letter: "A", text: "replication" },
+            { letter: "B", text: "accounting" },
+            { letter: "C", text: "authorization" },
+            { letter: "D", text: "authentication" },
+          ],
+          answer: "D",
+        },
+        {
+          num: 61,
+          question:
+            "In Active Directory Domain Services, an architectural element that consists of one or more domains that are part of the same contiguous namespace.",
+          options: [
+            { letter: "A", text: "domain tree" },
+            { letter: "B", text: "domain clients" },
+            { letter: "C", text: "domain controller" },
+            { letter: "D", text: "forest root" },
+          ],
+          answer: "A",
+        },
+        {
+          num: 62,
+          question:
+            "If an administrator creates a domain tree in an Active Directory forest, and then creates a separate and different domain tree, what is the relationship between the two domain trees?",
+          options: [
+            { letter: "A", text: "Single domain with multiple OUs" },
+            { letter: "B", text: "Completely separate entities with no trust" },
+            {
+              letter: "C",
+              text: "A single domain tree with multiple child domains",
+            },
+            {
+              letter: "D",
+              text: "Same security entity as one Active Directory forest, bidirectional trust between domain trees",
+            },
+          ],
+          answer: "D",
+        },
+        {
+          num: 63,
+          question:
+            'What is the PowerShell cmdlet for installing a domain controller to the domain "adatum.com"?',
+          options: [
+            {
+              letter: "A",
+              text: 'Install-windowsfeature -domainname "adatum.com"',
+            },
+            {
+              letter: "B",
+              text: 'Install-AddsForest -DomainName "adatum.com"',
+            },
+            {
+              letter: "C",
+              text: 'Install-addsdomaincontroller -domainname "adatum.com"',
+            },
+            {
+              letter: "D",
+              text: 'Install-addsdomain -domainname "adatum.com"',
+            },
+          ],
+          answer: "B",
+        },
+        {
+          num: 64,
+          question:
+            "What administrative division in Active Directory is defined as a collection of subnets that have good connectivity between them to facilitate the replication process?",
+          options: [
+            { letter: "A", text: "Forests" },
+            { letter: "B", text: "Locations" },
+            { letter: "C", text: "Domains" },
+            { letter: "D", text: "Sites" },
+          ],
+          answer: "D",
+        },
+        {
+          num: 65,
+          question:
+            "What is the fundamental component of the Active Directory architecture, functioning as the boundary for virtually all directory functions, including administration, access control, database management, and replication?",
+          options: [
+            { letter: "A", text: "Workgroup" },
+            { letter: "B", text: "Browser" },
+            { letter: "C", text: "Domain" },
+            { letter: "D", text: "Server" },
+          ],
+          answer: "C",
+        },
+        {
+          num: 66,
+          question:
+            "What is the method for removing a domain controller in Windows Server 2012 R2?",
+          options: [
+            { letter: "A", text: "Using the Remove Roles and Features Wizard" },
+            {
+              letter: "B",
+              text: "Manually Deleting the Domain Controller Files",
+            },
+            { letter: "C", text: "Reinstalling the Server Operating System" },
+            {
+              letter: "D",
+              text: "Using the Active Directory Users and Computers Console",
+            },
+          ],
+          answer: "A",
+        },
+        {
+          num: 67,
+          question:
+            "A set of network resources available for a group of users who can authenticate to the network to gain access to those resources.",
+          options: [
+            { letter: "A", text: "browser" },
+            { letter: "B", text: "server" },
+            { letter: "C", text: "workgroup" },
+            { letter: "D", text: "domain" },
+          ],
+          answer: "D",
+        },
+        {
+          num: 68,
+          question:
+            "What determines the functional level of an Active Directory forest?",
+          options: [
+            {
+              letter: "A",
+              text: "The amount of storage allocated to the domain",
+            },
+            { letter: "B", text: "The number of users in the domain" },
+            {
+              letter: "C",
+              text: "The highest version of Windows Server on a domain controller",
+            },
+            {
+              letter: "D",
+              text: "The lowest version of Windows Server on a domain controller",
+            },
+          ],
+          answer: "D",
+        },
+        {
+          num: 69,
+          question:
+            "What is not a container, nor full-fledged security division and cannot have Group Policy settings applied directly to them?",
+          options: [
+            { letter: "A", text: "Group" },
+            { letter: "B", text: "User" },
+            { letter: "C", text: "Policy" },
+            { letter: "D", text: "Owner" },
+          ],
+          answer: "A",
+        },
+        {
+          num: 70,
+          question:
+            "A Windows server with Active Directory Domain Services directory service installed. Each workstation computer joins the domain and is represented by a computer object. Administrators create user objects that represent human users. A domain differs from a workgroup because users log on to the domain once, rather than to each individual computer.",
+          options: [
+            { letter: "A", text: "domain tree" },
+            { letter: "B", text: "file server" },
+            { letter: "C", text: "domain controller" },
+            { letter: "D", text: "member server" },
+          ],
+          answer: "C",
+        },
+        {
+          num: 71,
+          question:
+            "What is the command-line tool and syntax for determining whether a domain controller has been registered in DNS?",
+          options: [
+            { letter: "A", text: "nslookup /query:<domain name> /type:srv" },
+            { letter: "B", text: "tracert <domain name> -h 30" },
+            {
+              letter: "C",
+              text: "dcdiag /test:registerindns /dnsdomain:<domain name> /v",
+            },
+            { letter: "D", text: "ping <domain name> -t" },
+          ],
+          answer: "C",
+        },
+        {
+          num: 72,
+          question:
+            "A collection of subnets that have good connectivity between them.",
+          options: [
+            { letter: "A", text: "site" },
+            { letter: "B", text: "forest" },
+            { letter: "C", text: "group" },
+            { letter: "D", text: "browser" },
+          ],
+          answer: "A",
+        },
+        {
+          num: 73,
+          question:
+            "In Active Directory Domain Services, the individual properties that combine to form an object.",
+          options: [
+            { letter: "A", text: "attributes" },
+            { letter: "B", text: "methods" },
+            { letter: "C", text: "constraints" },
+            { letter: "D", text: "relationships" },
+          ],
+          answer: "A",
+        },
+        {
+          num: 74,
+          question:
+            "What is the next level of Active Directory container object within a domain?",
+          options: [
+            { letter: "A", text: "Global catalog" },
+            { letter: "B", text: "Organizational unit" },
+            { letter: "C", text: "Shared folder" },
+            { letter: "D", text: "Directory schema" },
+          ],
+          answer: "B",
+        },
+        {
+          num: 75,
+          question:
+            "Active Directory keeps a naming convention for the domain that mirrors ______.",
+          options: [
+            { letter: "A", text: "HTTP" },
+            { letter: "B", text: "FTP" },
+            { letter: "C", text: "SMTP" },
+            { letter: "D", text: "DNS" },
+          ],
+          answer: "D",
+        },
+        {
+          num: 76,
+          question:
+            "A directory service that Microsoft first introduced in Windows 2000 Server and has upgraded in each successive server operating system release, including Windows Server 2012 R2.",
+          options: [
+            { letter: "A", text: "Microsoft Exchange Server" },
+            { letter: "B", text: "File Transfer Protocol (FTP) Server" },
+            { letter: "C", text: "Active Directory Domain Services (AD DS)" },
+            { letter: "D", text: "Windows Server Update Services (WSUS)" },
+          ],
+          answer: "C",
+        },
+        {
+          num: 77,
+          question:
+            "An Active Directory Domain Services component that specifies the attributes each type of object can possess, the type of data that can be stored in each attribute, and the object's place in the directory tree.",
+          options: [
+            { letter: "A", text: "directory schema" },
+            { letter: "B", text: "single-master replication" },
+            { letter: "C", text: "domain" },
+            { letter: "D", text: "client-server directory model" },
+          ],
+          answer: "A",
+        },
+        {
+          num: 78,
+          question:
+            "What is the PowerShell cmdlet and syntax for demoting a domain controller?",
+          options: [
+            { letter: "A", text: "Read-Only Domain Controller (RODC)" },
+            {
+              letter: "B",
+              text: "Windows Server 2012 R2 now allows administrators to use PowerShell.",
+            },
+            {
+              letter: "C",
+              text: 'Install-AddsForest -DomainName "adatum.com"',
+            },
+            {
+              letter: "D",
+              text: "Uninstall-ADDSDomainController -ForceRemoval LocalAdministratorPassword <password> -Force",
+            },
+          ],
+          answer: "D",
+        },
+        {
+          num: 79,
+          question:
+            "What allows administrators to grant users in one domain access to resources of another domain within the same domain tree?",
+          options: [
+            {
+              letter: "A",
+              text: "Bidirectional trust relationship between domains",
+            },
+            {
+              letter: "B",
+              text: "Unidirectional trust relationship between domains",
+            },
+            { letter: "C", text: "Domain isolation policy" },
+            { letter: "D", text: "Single sign-on authenticatio" },
+          ],
+          answer: "A",
+        },
+        {
+          num: 80,
+          question:
+            "The standard communications protocol for directory service products, including Active Directory Domain Services.",
+          options: [
+            { letter: "A", text: "Lightweight Domain Access Protocol (LDAP)" },
+            {
+              letter: "B",
+              text: "Lightweight Directory Access Protocol (LDAP)",
+            },
+            { letter: "C", text: "Local Data Access Protocol (LDAP)" },
+            { letter: "D", text: "Layered Directory Service Protocol (LDAP)" },
+          ],
+          answer: "B",
+        },
+        {
+          num: 81,
+          question:
+            "What is the key difference between groups and Organizational Units (OUs)?",
+          options: [
+            {
+              letter: "A",
+              text: "Because groups are independent from domain structure, its members may be located anywhere in the domain or outside the domain.",
+            },
+            {
+              letter: "B",
+              text: "You cannot apply Group Policy settings directly to group objects.",
+            },
+            {
+              letter: "C",
+              text: "OUs are containers, whereas groups are not containers.",
+            },
+            {
+              letter: "D",
+              text: "There is essentially no difference between OUs and groups.",
+            },
+          ],
+          answer: "A",
+        },
+        {
+          num: 82,
+          question:
+            "An Active Directory functional level must be low enough to ensure interoperability between domain controllers running different versions of Windows Server. How does the functional level affect the AD forest?",
+          options: [
+            {
+              letter: "A",
+              text: "Higher functional level means more efficient AD communication.",
+            },
+            {
+              letter: "B",
+              text: "Higher functional level means few Global Catalog errors.",
+            },
+            {
+              letter: "C",
+              text: "Lower functional level means fewer features available.",
+            },
+            {
+              letter: "D",
+              text: "Lower functional level means time to upgrade the lowest servers.",
+            },
+          ],
+          answer: "C",
+        },
+        {
+          num: 83,
+          question:
+            "What is the simplest way for administrators to upgrade their Active Directory Domain Services (AD DS) infrastructure to Windows Server 2012 R2?",
+          options: [
+            {
+              letter: "A",
+              text: "Upgrade all existing down-level domain controllers (DCs) to Windows Server 2012 R2.",
+            },
+            {
+              letter: "B",
+              text: "In Server Manager, use the Active Directory Domain Services Configuration Wizard to update a DC.",
+            },
+            {
+              letter: "C",
+              text: "Add a new Windows Server 2012 R2 server to your existing Directory Services installation.",
+            },
+            {
+              letter: "D",
+              text: "Use Adprep.exe, included in the operating system.",
+            },
+          ],
+          answer: "C",
+        },
+        {
+          num: 84,
+          question:
+            "What is an important difference between groups and organizational units (OUs)?",
+          options: [
+            {
+              letter: "A",
+              text: "An OU can represent the various divisions of your organization.",
+            },
+            { letter: "B", text: "Group membership can be a subset of an OU." },
+            { letter: "C", text: "OUs are a security entity." },
+            {
+              letter: "D",
+              text: "Group memberships are independent of the domain's tree structure.",
+            },
+          ],
+          answer: "D",
+        },
+        {
+          num: 85,
+          question:
+            "What is the default trust relationship between domains in one forest?",
+          options: [
+            {
+              letter: "A",
+              text: "Two-way trust relationship between domain trees",
+            },
+            {
+              letter: "B",
+              text: "By default, no trust relationship between domain trees",
+            },
+            {
+              letter: "C",
+              text: "One-way trust relationship between domain trees",
+            },
+            {
+              letter: "D",
+              text: "Each domain tree trusts the forest, but not between each other",
+            },
+          ],
+          answer: "A",
+        },
+        {
+          num: 86,
+          question:
+            "What are the two basic classes of Active Directory objects?",
+          options: [
+            { letter: "A", text: "Resource" },
+            { letter: "B", text: "Leaf" },
+            { letter: "C", text: "Domain" },
+            { letter: "D", text: "Container" },
+          ],
+          answer: "B,D",
+        },
+        {
+          num: 87,
+          question:
+            "What is the first domain installed in a new Active Directory forest called?",
+          options: [
+            { letter: "A", text: "Forest root domain" },
+            { letter: "B", text: "Parent root domain" },
+            { letter: "C", text: "Domain tree root" },
+            { letter: "D", text: "Domain root" },
+          ],
+          answer: "A",
+        },
+        {
+          num: 88,
+          question:
+            "Which of the following is not true about an object's attributes?",
+          options: [
+            {
+              letter: "A",
+              text: "Administrators must manually supply information for certain attributes.",
+            },
+            {
+              letter: "B",
+              text: "Every container object has, as an attribute, a list of all the other objects it contains.",
+            },
+            { letter: "C", text: "Leaf objects do not contain attributes." },
+            {
+              letter: "D",
+              text: "Active Directory automatically creates the globally unique identifier (GUID).",
+            },
+          ],
+          answer: "C",
+        },
+        {
+          num: 89,
+          question:
+            "Which of the following items is a valid leaf object in Active Directory?",
+          options: [
+            { letter: "A", text: "Domain" },
+            { letter: "B", text: "User" },
+            { letter: "C", text: "Application partition" },
+            { letter: "D", text: "OU" },
+          ],
+          answer: "B",
+        },
+        {
+          num: 90,
+          question:
+            "Which of the following does an Active Directory client use to locate objects in another domain?",
+          options: [
+            { letter: "A", text: "DNS" },
+            { letter: "B", text: "Global Catalog" },
+            { letter: "C", text: "DHCP" },
+            { letter: "D", text: "Site Link" },
+          ],
+          answer: "B",
+        },
+        {
+          num: 91,
+          question:
+            "Is it possible to add AD DS on a computer running Server Core?",
+          options: [
+            {
+              letter: "A",
+              text: "No, you require the full GUI installation of Windows Server 2012 R2.",
+            },
+            {
+              letter: "B",
+              text: "Yes, you use Dcpromo.exe and accompanying answer files.",
+            },
+            {
+              letter: "C",
+              text: "No, unless all servers are already running Windows 2012.",
+            },
+            {
+              letter: "D",
+              text: "Yes, you use PowerShell, by first installing AD DS role, and then promoting the server to a DC.",
+            },
+          ],
+          answer: "D",
+        },
+        {
+          num: 92,
+          question:
+            "What is required by DNS for Active Directory to function? Choose Two",
+          options: [
+            { letter: "A", text: "Dynamic update support" },
+            { letter: "B", text: "DHCP forwarding support" },
+            { letter: "C", text: "SRV records support" },
+            { letter: "D", text: "Active Directory integration" },
+          ],
+          answer: "A,C",
+        },
+        {
+          num: 93,
+          question:
+            "Which of the following cannot contain multiple Active Directory domains?",
+          options: [
+            { letter: "A", text: "organizational units" },
+            { letter: "B", text: "sites" },
+            { letter: "C", text: "trees" },
+            { letter: "D", text: "forests" },
+          ],
+          answer: "A",
+        },
+        {
+          num: 94,
+          question:
+            "What is the primary reason for creating different sites on an Active Directory network?",
+          options: [
+            {
+              letter: "A",
+              text: "To create geographical divisions within the Active Directory",
+            },
+            {
+              letter: "B",
+              text: "To provide another boundary when applying Group Policy settings (along with domains and OUs)",
+            },
+            {
+              letter: "C",
+              text: "To provide a layer of access control between objects in differing sites",
+            },
+            {
+              letter: "D",
+              text: "To control the amount of traffic passing over the relatively slow and expensive WAN links between locations",
+            },
+          ],
+          answer: "D",
+        },
+        {
+          num: 95,
+          question: "Who may join a computer to the domain?",
+          options: [
+            {
+              letter: "A",
+              text: "only domain administrators may join a computer to the domain.",
+            },
+            {
+              letter: "B",
+              text: "anyone with a user account may join a computer to the domain.",
+            },
+            {
+              letter: "C",
+              text: "only the it department can join a computer to the domain.",
+            },
+            {
+              letter: "D",
+              text: "Members of the computer's local Administrators group may join the computer to the domain.",
+            },
+          ],
+          answer: "D",
+        },
+        {
+          num: 96,
+          question:
+            "What can be used to add, delete, or modify objects in Active Directory, in addition to modifying the schema if necessary?",
+          options: [
+            { letter: "A", text: "Djoin" },
+            { letter: "B", text: "LDIFDE" },
+            { letter: "C", text: "Administrator" },
+            { letter: "D", text: "network accounts" },
+          ],
+          answer: "B",
+        },
+        {
+          num: 97,
+          question:
+            "What is a key benefit to using ADAC or the Active Directory Users and Computers console?",
+          options: [
+            {
+              letter: "A",
+              text: "ADAC allows you to create new user accounts only.",
+            },
+            {
+              letter: "B",
+              text: "adac is primarily used for monitoring user activity.",
+            },
+            {
+              letter: "C",
+              text: "ADAC allows you to modify the properties of multiple users or multiple computers at once.",
+            },
+            {
+              letter: "D",
+              text: "adac provides a way to delete user accounts easily.",
+            },
+          ],
+          answer: "C",
+        },
+        {
+          num: 98,
+          question:
+            "What differences matter most in creating a single user versus multiple users?",
+          options: [
+            {
+              letter: "A",
+              text: "Single user creation is often done from the graphical user interface (GUI), whereas creating multiple users typically requires using command-line tools.",
+            },
+            {
+              letter: "B",
+              text: "single user creation requires a database, while multiple users can be created without one.",
+            },
+            {
+              letter: "C",
+              text: "single user creation is faster than creating multiple users, which takes longer.",
+            },
+            {
+              letter: "D",
+              text: "single user creation is only possible through scripts, while multiple users can be created through the gui.",
+            },
+          ],
+          answer: "A",
+        },
+        {
+          num: 99,
+          question:
+            "What is the Windows PowerShell cmdlet syntax for creating a new computer object?",
+          options: [
+            {
+              letter: "A",
+              text: "Create-computer -name <computer name> -location <site name>",
+            },
+            {
+              letter: "B",
+              text: "New-ADComputer -Name <computer name> -path <distinguished name>",
+            },
+            {
+              letter: "C",
+              text: "Add-newcomputer -name <computer name> -domain <domain name>",
+            },
+            {
+              letter: "D",
+              text: "Register-computer -name <computer name> -group <group name>",
+            },
+          ],
+          answer: "B",
+        },
+        {
+          num: 100,
+          question:
+            "When using Netdom.exe to join an account, you may add the parameter [/OU:OUDN]. If this parameter is left out, where is the object placed?",
+          options: [
+            { letter: "A", text: "In the Users container" },
+            { letter: "B", text: "in the domain controllers container" },
+            { letter: "C", text: "In the Computers container" },
+            { letter: "D", text: "in the managed service accounts container" },
+          ],
+          answer: "C",
+        },
+        {
+          num: 101,
+          question:
+            "What is the Windows PowerShell cmdlet syntax for creating a new user account?",
+          options: [
+            { letter: "A", text: "New-ADUser" },
+            { letter: "B", text: "header record" },
+            { letter: "C", text: "network accounts" },
+            { letter: "D", text: "New-user" },
+          ],
+          answer: "A",
+        },
+        {
+          num: 102,
+          question:
+            "Which of the following utilities do you use to perform an offline domain join?",
+          options: [
+            { letter: "A", text: "administrator" },
+            { letter: "B", text: "ldifde" },
+            { letter: "C", text: "djoin" },
+            { letter: "D", text: "header record" },
+          ],
+          answer: "C",
+        },
+        {
+          num: 103,
+          question:
+            "Which of the following are the two built-in user accounts created automatically on a computer running Windows Server 2012 R2?",
+          options: [
+            { letter: "A", text: "Administrator" },
+            { letter: "B", text: "Ldifde" },
+            { letter: "C", text: "Djoin" },
+            { letter: "D", text: "standard user" },
+          ],
+          answer: "A",
+        },
+        {
+          num: 104,
+          question:
+            "When using CSVDE, what is the first line of the text file that uses proper attribute names?",
+          options: [
+            { letter: "A", text: "djoin" },
+            { letter: "B", text: "header record" },
+            { letter: "C", text: "administrator" },
+            { letter: "D", text: "network accounts" },
+          ],
+          answer: "B",
+        },
+        {
+          num: 105,
+          question:
+            "What is the primary means by which people access resources on an Active Directory Domain Service (AD DS) network?",
+          options: [
+            { letter: "A", text: "By using a guest account" },
+            { letter: "B", text: "By connecting via a vpn" },
+            { letter: "C", text: "By having a user account" },
+            { letter: "D", text: "by accessing public wi-fi" },
+          ],
+          answer: "C",
+        },
+        {
+          num: 106,
+          question:
+            "Are typical, authenticated users able to create computer objects in an Active Directory?",
+          options: [
+            {
+              letter: "A",
+              text: "Single user creation is often done from the graphical user interface (GUI), whereas creating multiple users typically requires using command-line tools.",
+            },
+            {
+              letter: "B",
+              text: "Members of the computer's local Administrators group may join the computer to the domain.",
+            },
+            {
+              letter: "C",
+              text: "ADAC allows you to modify the properties of multiple users or multiple computers at once.",
+            },
+            {
+              letter: "D",
+              text: "Yes, by default, users who are successfully authenticated to Active Directory are permitted to join up to ten workstations to the domain, thus creating up to 10 associated computer objects.",
+            },
+          ],
+          answer: "D",
+        },
+        {
+          num: 107,
+          question:
+            "Which of the following is not a type of user account that can be configured in Windows Server 2012 R2?",
+          options: [
+            { letter: "A", text: "header record" },
+            { letter: "B", text: "ldifde" },
+            { letter: "C", text: "network accounts" },
+            { letter: "D", text: "djoin" },
+          ],
+          answer: "C",
+        },
+        {
+          num: 108,
+          question:
+            "What two graphical tools will help create either user or computer objects?",
+          options: [
+            {
+              letter: "A",
+              text: "active directory users and groups and group policy management",
+            },
+            {
+              letter: "B",
+              text: "Active Directory Administrative Center and Active Directory Users and Computer",
+            },
+            { letter: "C", text: "windows powershell and command prompt" },
+            { letter: "D", text: "system configuration and task scheduler" },
+          ],
+          answer: "B",
+        },
+        {
+          num: 109,
+          question:
+            "You are preparing a new branch office with new computers. Unfortunately, the branch office network will still be down on the day you've planned to be there. You would like to join the computers to the domain without having to drive back later. What program can you run ahead of time to do this?",
+          options: [
+            { letter: "A", text: "DCPROMO.EXE" },
+            { letter: "B", text: "DJOIN.EXE" },
+            { letter: "C", text: "CSVDE.EXE" },
+            { letter: "D", text: "LDIFDE.EXE" },
+          ],
+          answer: "B",
+        },
+      ];
+      let questions = [];
+      let index = 0;
+      let score = 0;
+      let answers = [];
+      function startQuiz(shuffle) {
+        questions = JSON.parse(JSON.stringify(originalQuestions));
+        if (shuffle) questions.sort(() => Math.random() - 0.5);
+        index = 0;
+        score = 0;
+        answers = [];
+        document.getElementById("startScreen").style.display = "none";
+        document.getElementById("quizScreen").style.display = "block";
+        showQuestion();
+      }
+      function showQuestion() {
+        const q = questions[index];
+        document.getElementById("progress").textContent =
+          `Question ${index + 1} of ${questions.length} | Score: ${score}`;
+        document.getElementById("question").textContent =
+          `Q${q.num}. ${q.question}`;
+        const form = document.getElementById("options");
+        form.innerHTML = "";
+        const isMulti = q.answer.includes(",");
+        q.options.forEach((opt) => {
+          const label = document.createElement("label");
+          label.className = "option";
+          const input = document.createElement("input");
+          input.type = isMulti ? "checkbox" : "radio";
+          input.name = "answer";
+          input.value = opt.letter;
+          label.appendChild(input);
+          label.appendChild(
+            document.createTextNode(` ${opt.letter}. ${opt.text}`),
+          );
+          form.appendChild(label);
+        });
+        document.getElementById("feedback").style.display = "none";
+        document.getElementById("checkBtn").style.display = "inline-block";
+        document.getElementById("nextBtn").style.display = "none";
+      }
+      function selectedAnswer() {
+        return Array.from(document.querySelectorAll("#options input:checked"))
+          .map((x) => x.value)
+          .sort()
+          .join(",");
+      }
+      function answerText(q) {
+        const letters = q.answer.split(",");
+        return letters
+          .map(
+            (l) =>
+              `${l}. ${(q.options.find((o) => o.letter === l) || { text: "" }).text}`,
+          )
+          .join(" | ");
+      }
+      function checkAnswer() {
+        const q = questions[index];
+        const sel = selectedAnswer();
+        const fb = document.getElementById("feedback");
+        if (!sel) {
+          alert("Choose an answer first.");
+          return;
+        }
+        const correct = sel === q.answer.split(",").sort().join(",");
+        if (correct) {
+          score++;
+          fb.className = "feedback correct";
+          fb.textContent = `Correct ✅ Answer: ${answerText(q)}`;
+        } else {
+          fb.className = "feedback wrong";
+          fb.textContent = `Wrong ❌ Correct answer: ${answerText(q)}`;
+        }
+        answers.push({
+          num: q.num,
+          question: q.question,
+          selected: sel,
+          correct: q.answer,
+          isCorrect: correct,
+        });
+        fb.style.display = "block";
+        document.getElementById("checkBtn").style.display = "none";
+        document.getElementById("nextBtn").style.display = "inline-block";
+      }
+      function nextQuestion() {
+        index++;
+        if (index >= questions.length) return showResults();
+        showQuestion();
+      }
+      function showResults() {
+        document.getElementById("quizScreen").style.display = "none";
+        const pct = Math.round((score / questions.length) * 100);
+        let html = `<h1>Results</h1><h2>${score} / ${questions.length} (${pct}%)</h2>`;
+        html +=
+          '<button class="primary" onclick="location.reload()">Restart</button><h2>Review</h2>';
+        answers.forEach((a) => {
+          html += `<div class="resultItem"><b>Q${a.num}</b> - ${a.isCorrect ? "✅" : "❌"} Your answer: ${a.selected} | Correct: ${a.correct}</div>`;
+        });
+        const rs = document.getElementById("resultScreen");
+        rs.innerHTML = html;
+        rs.style.display = "block";
+      }
+
+      function toggleDark() {
+        document.body.classList.toggle("dark");
+        localStorage.setItem(
+          "quizDarkMode",
+          document.body.classList.contains("dark"),
+        );
+      }
+      if (localStorage.getItem("quizDarkMode") === "true") {
+        document.body.classList.add("dark");
+      }
+    </script>
+  </body>
 </html>
